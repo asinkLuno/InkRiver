@@ -42,7 +42,8 @@ test("navigates through the key story views", async ({ page }) => {
 
   await page.getByRole("link", { name: "Narrative", exact: true }).click();
   await expect(page.getByRole("heading", { name: "Narrative" })).toBeVisible();
-  await expect(page.getByText("Observer: genly")).toBeVisible();
+  await expect(page.getByText("Observer")).toBeVisible();
+  await expect(page.getByText("genly").first()).toBeVisible();
 });
 
 test("keeps narrow navigation usable and marks the current page", async ({

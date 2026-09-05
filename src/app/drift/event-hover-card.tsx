@@ -1,8 +1,10 @@
 "use client";
 
 import type { ReactElement } from "react";
-import { CalendarRangeIcon, UsersIcon } from "lucide-react";
+import { CalendarRangeIcon } from "lucide-react";
+import type { MoaiMap } from "@/lib/api";
 import { COPY, initialLanguage } from "@/lib/i18n";
+import { dyeVar } from "@/lib/palette";
 
 import {
   HoverCard,
@@ -15,6 +17,7 @@ interface EventHoverCardProps {
   start: string;
   end: string | null;
   description: string | null;
+  moaiMap?: MoaiMap;
   moais: Array<{
     name: string;
     offset: [string, string | null] | null;
@@ -27,6 +30,7 @@ export function EventHoverCard({
   start,
   end,
   description,
+  moaiMap,
   moais,
   trigger,
 }: EventHoverCardProps) {
@@ -40,7 +44,7 @@ export function EventHoverCard({
         <div className="space-y-3">
           <div>
             <h3 className="text-base leading-snug font-semibold">{title}</h3>
-            <div className="mt-1.5 flex items-start gap-2 font-mono text-xs text-muted-foreground">
+            <div className="mt-1.5 flex items-start gap-2 text-xs text-muted-foreground tnum">
               <CalendarRangeIcon className="mt-0.5 size-3.5 shrink-0" />
               <span>
                 {start}
@@ -56,29 +60,33 @@ export function EventHoverCard({
           )}
 
           {moais.length > 0 && (
-            <div className="flex items-start gap-2 border-t pt-3">
-              <UsersIcon className="mt-1 size-3.5 shrink-0 text-muted-foreground" />
-              <div className="min-w-0 flex-1 space-y-1.5">
-                {moais.map(({ name, offset }) => (
-                  <div
-                    key={name}
-                    className="flex items-baseline justify-between gap-3 rounded-md bg-muted px-2 py-1 text-xs"
-                  >
-                    <span className="font-medium">{name}</span>
-                    <span className="text-right font-mono text-muted-foreground">
-                      {offset ? (
-                        <>
-                          Δ {offset[0]}
-                          {offset[1] ? ` — ${offset[1]}` : ""}
-                        </>
-                      ) : (
-                        COPY[initialLanguage()].event_no_base_time
-                      )}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            </div>
+            <ul className="space-y-1.5 border-t pt-3">
+              {moais.map(({ name, offset }) => (
+                <li
+                  key={name}
+                  className="flex items-center justify-between gap-3 rounded-md bg-muted px-2.5 py-1.5 text-xs"
+                >
+                  <span className="flex min-w-0 items-center gap-1.5 font-medium">
+                    <span
+                      aria-hidden="true"
+                      className="size-2 shrink-0 rounded-full"
+                      style={{ backgroundColor: dyeVar(name, moaiMap) }}
+                    />
+                    <span className="truncate">{name}</span>
+                  </span>
+                  <span className="shrink-0 text-right text-muted-foreground tnum">
+                    {offset ? (
+                      <>
+                        Δ {offset[0]}
+                        {offset[1] ? ` — ${offset[1]}` : ""}
+                      </>
+                    ) : (
+                      COPY[initialLanguage()].event_no_base_time
+                    )}
+                  </span>
+                </li>
+              ))}
+            </ul>
           )}
         </div>
       </HoverCardContent>

@@ -7,9 +7,9 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: system-ui, sans-serif;
+  --font-sans: var(--app-font-sans);
   --font-mono: ui-monospace, monospace;
-  --font-heading: system-ui, sans-serif;
+  --font-display: var(--app-font-display);
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -39,6 +39,13 @@
   --color-popover: var(--popover);
   --color-card-foreground: var(--card-foreground);
   --color-card: var(--card);
+  --color-success: var(--success);
+  --color-dye-1: var(--dye-1);
+  --color-dye-2: var(--dye-2);
+  --color-dye-3: var(--dye-3);
+  --color-dye-4: var(--dye-4);
+  --color-dye-5: var(--dye-5);
+  --color-dye-6: var(--dye-6);
   --radius-sm: calc(var(--radius) * 0.6);
   --radius-md: calc(var(--radius) * 0.8);
   --radius-lg: var(--radius);
@@ -49,72 +56,100 @@
 }
 
 :root {
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
+  /* 纸与墨:微暖纸白,冷墨前景 */
+  --background: oklch(0.987 0.004 95);
+  --foreground: oklch(0.25 0.015 260);
   --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
+  --card-foreground: var(--foreground);
   --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.539 0.2797 264.35);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.539 0.2797 264.35);
-  --chart-1: oklch(0.646 0.222 41.116);
-  --chart-2: oklch(0.6 0.118 184.704);
-  --chart-3: oklch(0.398 0.07 227.392);
-  --chart-4: oklch(0.828 0.189 84.429);
-  --chart-5: oklch(0.769 0.188 70.08);
-  --radius: 0.625rem;
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.539 0.2797 264.35);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.539 0.2797 264.35);
+  --popover-foreground: var(--foreground);
+  /* 靛:蓝染与墨水 */
+  --primary: oklch(0.44 0.105 258);
+  --primary-foreground: oklch(0.985 0.005 95);
+  --secondary: oklch(0.955 0.005 95);
+  --secondary-foreground: var(--foreground);
+  --muted: oklch(0.955 0.005 95);
+  --muted-foreground: oklch(0.5 0.015 260);
+  --accent: oklch(0.947 0.007 95);
+  --accent-foreground: var(--foreground);
+  --destructive: oklch(0.5 0.17 25);
+  --success: oklch(0.53 0.09 168);
+  --border: oklch(0.902 0.008 95);
+  --input: oklch(0.902 0.008 95);
+  --ring: var(--primary);
+  --chart-1: var(--dye-1);
+  --chart-2: var(--dye-2);
+  --chart-3: var(--dye-3);
+  --chart-4: var(--dye-4);
+  --chart-5: var(--dye-5);
+  --radius: 0.5rem;
+  --sidebar: oklch(0.965 0.006 95);
+  --sidebar-foreground: var(--foreground);
+  --sidebar-primary: var(--primary);
+  --sidebar-primary-foreground: var(--primary-foreground);
+  --sidebar-accent: oklch(0.93 0.008 95);
+  --sidebar-accent-foreground: var(--foreground);
+  --sidebar-border: oklch(0.89 0.008 95);
+  --sidebar-ring: var(--primary);
+
+  /* 染线:靛 / 茜 / 藤黄 / 石绿 / 青 / 紫 */
+  --dye-1: oklch(0.47 0.11 258);
+  --dye-2: oklch(0.55 0.15 25);
+  --dye-3: oklch(0.7 0.12 85);
+  --dye-4: oklch(0.55 0.1 155);
+  --dye-5: oklch(0.55 0.1 205);
+  --dye-6: oklch(0.5 0.13 315);
+
+  --app-font-sans:
+    system-ui, -apple-system, "Segoe UI", "PingFang SC", "Hiragino Sans GB",
+    "Microsoft YaHei UI", "Microsoft YaHei", "Noto Sans CJK SC", sans-serif;
+  /* 展示层衬线:书卷气,拉丁与汉字分别回退 */
+  --app-font-display:
+    "Iowan Old Style", "Palatino", "Palatino Linotype", "Songti SC",
+    "Noto Serif CJK SC", "Source Han Serif SC", "SimSun", serif;
 }
 
 .dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.145 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.145 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.539 0.2797 264.35);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.396 0.141 25.723);
-  --border: oklch(0.269 0 0);
-  --input: oklch(0.269 0 0);
-  --ring: oklch(0.539 0.2797 264.35);
-  --chart-1: oklch(0.488 0.243 264.376);
-  --chart-2: oklch(0.696 0.17 162.48);
-  --chart-3: oklch(0.769 0.188 70.08);
-  --chart-4: oklch(0.627 0.265 303.9);
-  --chart-5: oklch(0.645 0.246 16.439);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.539 0.2797 264.35);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(0.269 0 0);
-  --sidebar-ring: oklch(0.539 0.2797 264.35);
+  --background: oklch(0.19 0.012 260);
+  --foreground: oklch(0.93 0.006 95);
+  --card: oklch(0.225 0.012 260);
+  --card-foreground: var(--foreground);
+  --popover: oklch(0.225 0.012 260);
+  --popover-foreground: var(--foreground);
+  --primary: oklch(0.68 0.1 255);
+  --primary-foreground: oklch(0.17 0.012 260);
+  --secondary: oklch(0.27 0.012 260);
+  --secondary-foreground: var(--foreground);
+  --muted: oklch(0.27 0.012 260);
+  --muted-foreground: oklch(0.68 0.012 260);
+  --accent: oklch(0.29 0.014 260);
+  --accent-foreground: var(--foreground);
+  --destructive: oklch(0.62 0.16 25);
+  --success: oklch(0.68 0.09 168);
+  --border: oklch(0.3 0.012 260);
+  --input: oklch(0.3 0.012 260);
+  --ring: var(--primary);
+  --chart-1: var(--dye-1);
+  --chart-2: var(--dye-2);
+  --chart-3: var(--dye-3);
+  --chart-4: var(--dye-4);
+  --chart-5: var(--dye-5);
+  --sidebar: oklch(0.215 0.012 260);
+  --sidebar-foreground: var(--foreground);
+  --sidebar-primary: var(--primary);
+  --sidebar-primary-foreground: oklch(0.17 0.012 260);
+  --sidebar-accent: oklch(0.29 0.014 260);
+  --sidebar-accent-foreground: var(--foreground);
+  --sidebar-border: oklch(0.3 0.012 260);
+  --sidebar-ring: var(--primary);
+
+  /* 夜织:染线整体提亮,保持色相 */
+  --dye-1: oklch(0.66 0.11 258);
+  --dye-2: oklch(0.66 0.15 25);
+  --dye-3: oklch(0.78 0.12 85);
+  --dye-4: oklch(0.7 0.1 155);
+  --dye-5: oklch(0.7 0.1 205);
+  --dye-6: oklch(0.66 0.12 315);
 }
 
 @layer base {
@@ -130,11 +165,11 @@
   h1,
   h2,
   h3 {
-    @apply font-heading;
+    @apply font-sans;
     text-wrap: balance;
   }
   ::selection {
-    background: color-mix(in oklab, var(--primary) 22%, transparent);
+    background: color-mix(in oklab, var(--primary) 20%, transparent);
   }
 }
 
@@ -142,5 +177,14 @@
   .render-lazily {
     content-visibility: auto;
     contain-intrinsic-size: auto 500px;
+  }
+  /* 时间坐标:等宽数字,不用等宽字体 */
+  .tnum {
+    font-variant-numeric: tabular-nums;
+  }
+  /* 展示衬线,仅用于大标题 */
+  .font-display {
+    font-family: var(--app-font-display);
+    letter-spacing: 0.01em;
   }
 }

@@ -1,15 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { CalendarDays } from "lucide-react";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { PageError, PageLoading } from "@/components/page-state";
 import { COPY, initialLanguage } from "@/lib/i18n";
 import {
@@ -54,48 +45,51 @@ export default function StoryPage() {
   const { story, calendar } = data;
 
   return (
-    <main className="flex-1 px-6 py-8">
-      <div className="mx-auto max-w-3xl space-y-6">
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-2xl">{story.title}</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            {story.description && (
-              <div className="prose prose-sm max-w-none text-muted-foreground">
-                {story.description}
-              </div>
-            )}
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <div className="flex items-start justify-between gap-4">
-              <div>
-                <CardDescription className="mb-1 flex items-center gap-2">
-                  <CalendarDays className="size-4" aria-hidden="true" />
-                  {COPY[initialLanguage()].story_calendar}
-                </CardDescription>
-                <CardTitle>{calendar.title}</CardTitle>
-              </div>
-              <Badge variant="secondary">
-                {calendar.source === "builtin" ? COPY[initialLanguage()].story_builtin : COPY[initialLanguage()].story_plugin}
-              </Badge>
+    <main className="flex-1 px-6 py-10 sm:px-10">
+      <div className="mx-auto max-w-3xl">
+        <header>
+          <h1 className="font-display text-4xl leading-tight">{story.title}</h1>
+          {story.description && (
+            <div className="mt-5 max-w-[72ch] text-[15px] leading-7 text-foreground/85 whitespace-pre-wrap">
+              {story.description}
             </div>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            {calendar.description && (
-              <p className="text-sm leading-6 text-muted-foreground">
-                {calendar.description}
-              </p>
-            )}
-            <dl className="grid gap-3 text-sm sm:grid-cols-[8rem_1fr]">
-              <dt className="text-muted-foreground">{COPY[initialLanguage()].story_mode}</dt>
-              <dd className="font-mono text-xs">{calendar.name}</dd>
-            </dl>
-          </CardContent>
-        </Card>
+          )}
+        </header>
+
+        <section
+          aria-labelledby="story-calendar-heading"
+          className="mt-12 border-t pt-6"
+        >
+          <div className="grid gap-x-8 gap-y-4 sm:grid-cols-[9rem_1fr]">
+            <h2
+              id="story-calendar-heading"
+              className="text-sm font-medium text-muted-foreground"
+            >
+              {COPY[initialLanguage()].story_calendar}
+            </h2>
+            <div>
+              <div className="flex flex-wrap items-center gap-2.5">
+                <span className="font-display text-xl">{calendar.title}</span>
+                <span className="rounded-full border px-2 py-0.5 text-xs text-muted-foreground">
+                  {calendar.source === "builtin"
+                    ? COPY[initialLanguage()].story_builtin
+                    : COPY[initialLanguage()].story_plugin}
+                </span>
+              </div>
+              {calendar.description && (
+                <p className="mt-2 max-w-[64ch] text-sm leading-6 text-muted-foreground">
+                  {calendar.description}
+                </p>
+              )}
+              <dl className="mt-3 flex items-baseline gap-2 text-sm">
+                <dt className="text-muted-foreground">
+                  {COPY[initialLanguage()].story_mode}
+                </dt>
+                <dd className="tnum text-xs">{calendar.name}</dd>
+              </dl>
+            </div>
+          </div>
+        </section>
       </div>
     </main>
   );

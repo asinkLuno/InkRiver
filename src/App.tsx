@@ -1,12 +1,15 @@
 import { lazy, Suspense, useCallback, useEffect, useState } from "react";
 import type { UnlistenFn } from "@tauri-apps/api/event";
-import { Clock3, FileText, FileX, FolderOpen } from "lucide-react";
 import {
-  NavigationMenu,
-  NavigationMenuItem,
-  NavigationMenuLink,
-  NavigationMenuList,
-} from "@/components/ui/navigation-menu";
+  BookOpen,
+  Eye,
+  FileX,
+  FolderOpen,
+  Waves,
+  Waypoints,
+  Settings,
+  Users,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { PageErrorBoundary, PageLoading } from "@/components/page-state";
 import { SettingsDialog } from "@/components/settings-dialog";
@@ -34,6 +37,7 @@ import {
   formatErrorMessage,
   type Language,
 } from "@/lib/i18n";
+import { ThreadMark } from "@/components/thread-mark";
 
 const StoryPage = lazy(() => import("@/app/story/page"));
 const MoaiPage = lazy(() => import("@/app/moai/page"));
@@ -42,11 +46,11 @@ const DriftPage = lazy(() => import("@/app/drift/page"));
 const NarrativePage = lazy(() => import("@/app/narrative/page"));
 
 const NAV_ITEMS = [
-  { key: "nav_story", path: "/story" },
-  { key: "nav_moai", path: "/moai" },
-  { key: "nav_moai_link", path: "/moai-link" },
-  { key: "nav_drift", path: "/drift" },
-  { key: "nav_narrative", path: "/narrative" },
+  { key: "nav_story", path: "/story", icon: BookOpen },
+  { key: "nav_moai", path: "/moai", icon: Users },
+  { key: "nav_moai_link", path: "/moai-link", icon: Waypoints },
+  { key: "nav_drift", path: "/drift", icon: Waves },
+  { key: "nav_narrative", path: "/narrative", icon: Eye },
 ] as const;
 
 const PAGES: Record<string, React.ComponentType> = {
@@ -79,6 +83,10 @@ function loadRecentStories(): OpenedStory[] {
 
 function currentPath() {
   return window.location.hash.slice(1) || "/story";
+}
+
+function navLabel(language: Language, key: (typeof NAV_ITEMS)[number]["key"]) {
+  return COPY[language][key];
 }
 
 export function App() {
@@ -317,10 +325,10 @@ export function App() {
 
   const dragOverlay = dragPath !== null && (
     <div
-      className="fixed inset-0 z-[60] flex items-center justify-center bg-black/40 backdrop-blur-sm"
+      className="fixed inset-0 z-[60] flex items-center justify-center bg-foreground/30 backdrop-blur-sm"
       aria-live="polite"
     >
-      <div className="pointer-events-none rounded-xl border-2 border-dashed border-primary/50 bg-background/95 px-12 py-8 text-center shadow-lg">
+      <div className="pointer-events-none rounded-xl border-2 border-dashed border-primary/60 bg-background px-12 py-8 text-center shadow-lg">
         <FolderOpen className="mx-auto mb-3 size-8 text-primary" />
         <p className="text-sm font-medium">{COPY[language].landing_drop_to_open}</p>
         <p
@@ -359,26 +367,16 @@ export function App() {
     return (
       <>
         <main className="flex min-h-screen items-center justify-center px-6 py-12">
-          <div className="w-full max-w-lg">
+          <div className="w-full max-w-md">
             <div className="text-center">
-              <img
-                src="/logo-icon.svg"
-                alt="WEFT"
-                width={40}
-                height={40}
-                className="mx-auto mb-6"
-              />
-              <h1 className="text-2xl font-semibold tracking-tight">
+              <ThreadMark className="mx-auto mb-8 h-20 w-full max-w-72 text-foreground/70" />
+              <h1 className="font-display text-3xl leading-tight">
                 {COPY[language].landing_title}
               </h1>
-              <p className="mt-2 text-sm leading-6 text-muted-foreground">
+              <p className="mx-auto mt-3 max-w-sm text-sm leading-6 text-muted-foreground">
                 {COPY[language].landing_description}
               </p>
-              <div className="mt-8 rounded-xl border border-dashed bg-card/50 px-8 py-10">
-                <FileText className="mx-auto mb-4 size-10 text-muted-foreground" />
-                <p className="mb-5 text-sm text-muted-foreground">
-                  {COPY[language].landing_formats}
-                </p>
+              <div className="mt-8">
                 <Button
                   type="button"
                   size="lg"
@@ -388,41 +386,44 @@ export function App() {
                   <FolderOpen data-icon="inline-start" />
                   {opening ? COPY[language].landing_opening : COPY[language].landing_choose}
                 </Button>
+                <p className="mt-3 text-xs text-muted-foreground">
+                  {COPY[language].landing_formats}
+                </p>
               </div>
             </div>
 
-            <section className="mt-8" aria-labelledby="recent-stories-heading">
+            <section className="mt-10" aria-labelledby="recent-stories-heading">
               <h2
                 id="recent-stories-heading"
-                className="mb-3 flex items-center gap-2 text-sm font-medium"
+                className="mb-2 border-b pb-2 text-sm font-medium"
               >
-                <Clock3 className="size-4 text-muted-foreground" />
                 {COPY[language].landing_recent}
               </h2>
               {recentStories.length > 0 ? (
-                <div className="overflow-hidden rounded-xl border bg-card">
+                <ul>
                   {recentStories.map((story) => (
-                    <button
-                      key={story.path}
-                      type="button"
-                      className="block w-full border-b px-4 py-3 text-left transition-colors last:border-b-0 hover:bg-accent disabled:opacity-50"
-                      onClick={() => handleOpenRecent(story)}
-                      disabled={opening}
-                    >
-                      <span className="block truncate text-sm font-medium">
-                        {story.title}
-                      </span>
-                      <span
-                        className="mt-1 block truncate text-xs text-muted-foreground"
-                        title={story.path}
+                    <li key={story.path}>
+                      <button
+                        type="button"
+                        className="block w-full border-b px-2 py-2.5 text-left transition-colors last:border-b-0 hover:bg-accent disabled:opacity-50"
+                        onClick={() => handleOpenRecent(story)}
+                        disabled={opening}
                       >
-                        {story.path}
-                      </span>
-                    </button>
+                        <span className="block truncate text-sm font-medium">
+                          {story.title}
+                        </span>
+                        <span
+                          className="mt-0.5 block truncate text-xs text-muted-foreground"
+                          title={story.path}
+                        >
+                          {story.path}
+                        </span>
+                      </button>
+                    </li>
                   ))}
-                </div>
+                </ul>
               ) : (
-                <p className="rounded-xl border border-dashed px-4 py-5 text-center text-sm text-muted-foreground">
+                <p className="px-2 py-4 text-sm text-muted-foreground">
                   {COPY[language].landing_no_recent}
                 </p>
               )}
@@ -446,10 +447,10 @@ export function App() {
         <main className="flex flex-1 items-center justify-center px-6 py-12">
           <div className="w-full max-w-md text-center">
             <FileX className="mx-auto mb-4 size-10 text-muted-foreground" />
-            <h1 className="text-xl font-semibold tracking-tight">
+            <h1 className="font-display text-2xl">
               {COPY[language].landing_file_lost_title}
             </h1>
-            <p className="mt-3 break-all rounded-md bg-muted px-3 py-2 font-mono text-xs text-muted-foreground">
+            <p className="mt-3 break-all rounded-md bg-muted px-3 py-2 text-xs text-muted-foreground">
               {fileLostPath}
             </p>
             <p className="mt-3 text-sm text-muted-foreground">
@@ -484,61 +485,124 @@ export function App() {
     ? appState.story_path.split(/[\\/]/).pop()
     : null;
 
+  const storyStatus = fileName && (
+    <>
+      <span
+        className="size-1.5 shrink-0 rounded-full bg-success"
+        aria-label={COPY[language].landing_watching}
+      />
+      <span className="min-w-0 truncate text-xs text-muted-foreground">
+        {fileName}
+      </span>
+    </>
+  );
+
   return (
     <>
-      <div className="min-h-screen flex flex-col">
+      <div className="flex h-screen overflow-hidden">
         <AppEvents onFileLost={onFileLost} language={language} />
-        <header className="flex flex-wrap items-center gap-x-6 gap-y-2 border-b border-border px-4 py-3 sm:flex-nowrap sm:px-6">
+
+        {/* 桌面端侧边栏 */}
+        <aside className="hidden w-60 shrink-0 flex-col border-r bg-sidebar md:flex">
           <a
             href="#/story"
-            className="flex items-center gap-2 text-lg font-semibold tracking-wide"
+            className="flex items-center gap-2.5 px-5 pt-5 pb-4"
+            aria-label="WEFT"
           >
-            <img src="/logo-icon.svg" alt="WEFT" width={20} height={20} />
-            WEFT
+            <img src="/logo-icon.svg" alt="" width={26} height={26} />
+            <span className="text-base font-semibold tracking-[0.18em]">
+              WEFT
+            </span>
           </a>
-          <NavigationMenu className="order-last min-w-0 max-w-none basis-full justify-start overflow-x-auto sm:order-none sm:basis-auto sm:overflow-visible">
-            <NavigationMenuList className="gap-1">
-              {NAV_ITEMS.map((item) => (
-                <NavigationMenuItem key={item.path}>
-                  <NavigationMenuLink
-                    href={`#${item.path}`}
-                    active={path === item.path}
-                    aria-current={path === item.path ? "page" : undefined}
-                  >
-                    {COPY[language][item.key as keyof typeof COPY[typeof language]]}
-                  </NavigationMenuLink>
-                </NavigationMenuItem>
-              ))}
-            </NavigationMenuList>
-          </NavigationMenu>
-          <div className="ml-auto flex min-w-0 items-center gap-3">
-            {openError && (
-              <span
-                className="max-w-80 truncate text-sm text-destructive"
-                title={openError}
-              >
-                {COPY[language].landing_open_failed}: {openError}
-              </span>
-            )}
-            {fileName && (
-              <span
-                className="flex max-w-32 items-center gap-1.5 truncate text-sm text-muted-foreground sm:max-w-60"
-                title={appState?.story_path ?? fileName}
-              >
-                <span
-                  className="size-1.5 rounded-full bg-emerald-500"
-                  aria-label={COPY[language].landing_watching}
-                />
-                <span className="truncate">{fileName}</span>
-              </span>
-            )}
+          <nav className="flex-1 space-y-0.5 px-3" aria-label={COPY[language].landing_title}>
+            {NAV_ITEMS.map(({ key, path: itemPath, icon: Icon }) => {
+              const active = path === itemPath;
+              return (
+                <a
+                  key={itemPath}
+                  href={`#${itemPath}`}
+                  aria-current={active ? "page" : undefined}
+                  className={`relative flex items-center gap-2.5 rounded-md px-3 py-2 text-sm transition-colors outline-none focus-visible:ring-2 focus-visible:ring-ring/50 ${
+                    active
+                      ? "bg-sidebar-accent font-medium text-foreground"
+                      : "text-muted-foreground hover:bg-sidebar-accent/60 hover:text-foreground"
+                  }`}
+                >
+                  {active && (
+                    <span
+                      aria-hidden="true"
+                      className="absolute left-0 h-4 w-0.5 -translate-x-1.5 rounded-full bg-primary"
+                    />
+                  )}
+                  <Icon className="size-4 shrink-0" aria-hidden="true" />
+                  {navLabel(language, key)}
+                </a>
+              );
+            })}
+          </nav>
+          <div className="space-y-2 border-t px-5 py-3.5">
+            <div className="flex items-center gap-2">{storyStatus}</div>
+            <button
+              type="button"
+              className="flex items-center gap-2 rounded-md px-0 py-1 text-xs text-muted-foreground transition-colors outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring/50"
+              onClick={() => setSettingsOpen(true)}
+            >
+              <Settings className="size-3.5" aria-hidden="true" />
+              {COPY[language].settings_title}
+            </button>
           </div>
-        </header>
-        <PageErrorBoundary key={path}>
-          <Suspense fallback={<PageLoading />}>
-            <Page />
-          </Suspense>
-        </PageErrorBoundary>
+        </aside>
+
+        {/* 窄窗口顶栏 */}
+        <div className="flex min-w-0 flex-1 flex-col">
+          <header className="border-b md:hidden">
+            <div className="flex items-center gap-2.5 px-4 py-3">
+              <img src="/logo-icon.svg" alt="WEFT" width={20} height={20} />
+              <span className="text-sm font-semibold tracking-[0.18em]">WEFT</span>
+              <div className="ml-auto flex min-w-0 items-center gap-2">{storyStatus}</div>
+            </div>
+            <nav
+              className="flex gap-1 overflow-x-auto px-3 pb-2"
+              aria-label={COPY[language].landing_title}
+            >
+              {NAV_ITEMS.map(({ key, path: itemPath, icon: Icon }) => {
+                const active = path === itemPath;
+                return (
+                  <a
+                    key={itemPath}
+                    href={`#${itemPath}`}
+                    aria-current={active ? "page" : undefined}
+                    className={`flex shrink-0 items-center gap-1.5 rounded-md px-2.5 py-1.5 text-sm transition-colors outline-none focus-visible:ring-2 focus-visible:ring-ring/50 ${
+                      active
+                        ? "bg-sidebar-accent font-medium text-foreground"
+                        : "text-muted-foreground hover:text-foreground"
+                    }`}
+                  >
+                    <Icon className="size-4 shrink-0" aria-hidden="true" />
+                    {navLabel(language, key)}
+                  </a>
+                );
+              })}
+            </nav>
+          </header>
+
+          {openError && (
+            <p
+              className="border-b bg-destructive/5 px-4 py-2 text-sm text-destructive sm:px-6"
+              role="alert"
+            >
+              {COPY[language].landing_open_failed}: {openError}
+            </p>
+          )}
+
+          <div className="flex min-h-0 flex-1 flex-col overflow-y-auto">
+            <PageErrorBoundary key={path}>
+              <Suspense fallback={<PageLoading />}>
+                <Page />
+              </Suspense>
+            </PageErrorBoundary>
+          </div>
+        </div>
       </div>
       {dialogs}
     </>

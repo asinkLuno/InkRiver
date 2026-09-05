@@ -32,7 +32,7 @@ export function SettingsDialog({
         <section className="space-y-2">
           <label className="block text-sm font-medium">{copy.settings_language}</label>
           <select
-            className="h-9 w-full rounded-md border bg-background px-3 text-sm"
+            className="h-9 w-full rounded-md border bg-card px-3 text-sm outline-none focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/40"
             value={language}
             onChange={(event) =>
               onLanguageChange(event.target.value as Language)
