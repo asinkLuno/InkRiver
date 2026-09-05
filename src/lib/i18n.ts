@@ -114,6 +114,7 @@ export const COPY = {
     gantt_event: "事件",
     gantt_duration: "持续",
     gantt_milestone: "节点",
+    gantt_dye: "线条颜色对应 Moai",
 
     /* 事件卡片 */
     event_no_base_time: "无基准时间",
@@ -122,7 +123,8 @@ export const COPY = {
     narrative_title: "叙事",
     narrative_empty: "暂无叙事时间线。",
     narrative_count: "共 {s} 条叙事 {n} 个事件",
-    narrative_observer: "观察者：{o} · 主题：{t}",
+    narrative_observer_label: "观察者",
+    narrative_subjects_label: "主题",
   },
 
   "zh-TW": {
@@ -237,6 +239,7 @@ export const COPY = {
     gantt_event: "事件",
     gantt_duration: "持續",
     gantt_milestone: "節點",
+    gantt_dye: "線條顏色對應 Moai",
 
     /* 事件卡片 */
     event_no_base_time: "無基準時間",
@@ -245,7 +248,8 @@ export const COPY = {
     narrative_title: "敘事",
     narrative_empty: "暫無敘事時間線。",
     narrative_count: "共 {s} 條敘事 {n} 個事件",
-    narrative_observer: "觀察者：{o} · 主題：{t}",
+    narrative_observer_label: "觀察者",
+    narrative_subjects_label: "主題",
   },
 
   lzh: {
@@ -358,6 +362,7 @@ export const COPY = {
     gantt_event: "事",
     gantt_duration: "延",
     gantt_milestone: "點",
+    gantt_dye: "線色應 Moai",
 
     /* 事卡 */
     event_no_base_time: "無基時",
@@ -366,7 +371,8 @@ export const COPY = {
     narrative_title: "敍事",
     narrative_empty: "尚無敍事時線。",
     narrative_count: "共 {s} 敍事 {n} 事",
-    narrative_observer: "觀者：{o} · 題：{t}",
+    narrative_observer_label: "觀者",
+    narrative_subjects_label: "題",
   },
 
   ja: {
@@ -482,6 +488,7 @@ export const COPY = {
     gantt_event: "イベント",
     gantt_duration: "期間",
     gantt_milestone: "マイルストーン",
+    gantt_dye: "線の色はモアイに対応",
 
     /* イベントカード */
     event_no_base_time: "基準時間なし",
@@ -490,7 +497,8 @@ export const COPY = {
     narrative_title: "ナラティブ",
     narrative_empty: "ナラティブタイムラインが見つかりません。",
     narrative_count: "全 {s} ナラティブ {n} イベント",
-    narrative_observer: "観察者: {o} · 主題: {t}",
+    narrative_observer_label: "観察者",
+    narrative_subjects_label: "主題",
   },
 
   eo: {
@@ -606,6 +614,7 @@ export const COPY = {
     gantt_event: "Evento",
     gantt_duration: "Daŭro",
     gantt_milestone: "Mejloŝtono",
+    gantt_dye: "Liniaj koloroj korespondas al moai-oj",
 
     /* Event-karto */
     event_no_base_time: "Neniu baza tempo",
@@ -614,7 +623,8 @@ export const COPY = {
     narrative_title: "Rakontaro",
     narrative_empty: "Neniuj rakontaraj templinioj trovitaj.",
     narrative_count: "{n} eventoj tra {s} rakontaroj",
-    narrative_observer: "Observanto: {o} · Temoj: {t}",
+    narrative_observer_label: "Observanto",
+    narrative_subjects_label: "Temoj",
   },
 
   en: {
@@ -729,6 +739,7 @@ export const COPY = {
     gantt_event: "Event",
     gantt_duration: "Duration",
     gantt_milestone: "Milestone",
+    gantt_dye: "Thread colors map to moai",
 
     /* Event hover card */
     event_no_base_time: "No base time",
@@ -737,7 +748,8 @@ export const COPY = {
     narrative_title: "Narrative",
     narrative_empty: "No narrative timelines found.",
     narrative_count: "{n} events across {s} narratives",
-    narrative_observer: "Observer: {o} · Subjects: {t}",
+    narrative_observer_label: "Observer",
+    narrative_subjects_label: "Subjects",
   },
 } as const;
 

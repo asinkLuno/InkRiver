@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import * as d3 from "d3";
 import { Focus, LocateFixed, Minus, Plus, Search, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { dyeVar } from "@/lib/palette";
 import type { GraphLink, GraphNode, LinkGraph, MoaiMap } from "@/lib/api";
 import { COPY, initialLanguage } from "@/lib/i18n";
 
@@ -31,7 +32,7 @@ interface GraphActions {
   focusNode: (id: string) => void;
 }
 
-const NODE_RADIUS = 20;
+const NODE_RADIUS = 13;
 
 function groupByLabel(data: LinkGraph): SubGraph[] {
   const byLabel = new Map<string, GraphLink[]>();
@@ -177,7 +178,7 @@ function GraphSection({ graph, moais }: { graph: SubGraph; moais: MoaiMap }) {
       .attr("orient", "auto-start-reverse")
       .append("path")
       .attr("d", "M0,-5L10,0L0,5")
-      .attr("fill", "#525252");
+      .attr("fill", "var(--muted-foreground)");
 
     const linkGroups = canvas
       .append("g")
@@ -189,8 +190,8 @@ function GraphSection({ graph, moais }: { graph: SubGraph; moais: MoaiMap }) {
     const paths = linkGroups
       .append("path")
       .attr("fill", "none")
-      .attr("stroke", "#525252")
-      .attr("stroke-opacity", 0.8)
+      .attr("stroke", "var(--muted-foreground)")
+      .attr("stroke-opacity", 0.55)
       .attr("stroke-width", 1.5)
       .attr("marker-end", `url(#${markerId})`)
       .attr("marker-start", (link) =>
@@ -202,9 +203,9 @@ function GraphSection({ graph, moais }: { graph: SubGraph; moais: MoaiMap }) {
       .attr("text-anchor", "middle")
       .attr("dy", -5)
       .attr("font-size", 10)
-      .attr("fill", "#404040")
+      .attr("fill", "var(--muted-foreground)")
       .attr("paint-order", "stroke")
-      .attr("stroke", "#fafafa")
+      .attr("stroke", "var(--background)")
       .attr("stroke-width", 4)
       .attr("stroke-linejoin", "round")
       .text((link) => link.relations);
@@ -224,17 +225,21 @@ function GraphSection({ graph, moais }: { graph: SubGraph; moais: MoaiMap }) {
     nodeGroups
       .append("circle")
       .attr("r", NODE_RADIUS)
-      .style("fill", "var(--primary)")
-      .attr("stroke", "#fafafa")
-      .attr("stroke-width", 1.5);
+      .style("fill", (node) => dyeVar(node.id, moais))
+      .attr("stroke", "var(--background)")
+      .attr("stroke-width", 2);
 
+    // 人名放在节点下方,避免长名字溢出圆形
     nodeGroups
       .append("text")
       .attr("text-anchor", "middle")
-      .attr("dy", ".32em")
-      .attr("font-family", "Arial, sans-serif")
-      .attr("font-size", 10)
-      .attr("fill", "#fafafa")
+      .attr("y", NODE_RADIUS + 15)
+      .attr("font-size", 11)
+      .attr("paint-order", "stroke")
+      .attr("stroke", "var(--background)")
+      .attr("stroke-width", 3)
+      .attr("stroke-linejoin", "round")
+      .style("fill", "var(--foreground)")
       .attr("pointer-events", "none")
       .text((node) => node.name);
 
@@ -458,7 +463,7 @@ function GraphSection({ graph, moais }: { graph: SubGraph; moais: MoaiMap }) {
       </div>
       <div
         ref={containerRef}
-        className="relative h-[min(65vh,42rem)] min-h-96 overflow-hidden rounded-lg border border-border bg-muted/30"
+        className="relative h-[min(65vh,42rem)] min-h-96 overflow-hidden rounded-lg border border-border bg-card bg-[linear-gradient(to_right,color-mix(in_oklab,var(--border)_55%,transparent)_1px,transparent_1px)] bg-[size:64px_100%]"
       >
         <svg
           ref={svgRef}
@@ -482,7 +487,18 @@ function GraphSection({ graph, moais }: { graph: SubGraph; moais: MoaiMap }) {
           >
             <X />
           </Button>
-          <h3 className="pr-8 text-base font-semibold">{selectedMoai.name}</h3>
+          <h3 className="flex items-center gap-2 pr-8 text-base font-semibold">
+            <span
+              aria-hidden="true"
+              className="size-2.5 shrink-0 rounded-full"
+              style={{
+                backgroundColor: selectedNodeId
+                  ? dyeVar(selectedNodeId, moais)
+                  : "var(--primary)",
+              }}
+            />
+            {selectedMoai.name}
+          </h3>
           {selectedMoai.base_time_display && (
             <p className="mt-1 font-mono text-xs text-muted-foreground">
               {selectedMoai.base_time_display}
@@ -517,8 +533,8 @@ export function MoaiLinkGraph({
     <main className="flex flex-1 flex-col px-4 py-6 sm:px-6">
       <div className="mx-auto w-full max-w-7xl">
         <div className="mb-5">
-          <h1 className="text-2xl font-semibold tracking-tight">{COPY[initialLanguage()].graph_title}</h1>
-          <p className="mt-1 text-sm text-muted-foreground">
+          <h1 className="font-display text-3xl">{COPY[initialLanguage()].graph_title}</h1>
+          <p className="mt-1.5 text-sm text-muted-foreground">
             {COPY[initialLanguage()].graph_subtitle}
           </p>
         </div>

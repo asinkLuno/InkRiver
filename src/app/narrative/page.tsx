@@ -10,7 +10,7 @@ import {
   type MoaiMap,
   type NarrativeMap,
 } from "@/lib/api";
-import { compareDriftTime, DriftGantt, GanttLegend } from "../drift/gantt";
+import { compareDriftTime, DriftGantt, GanttLegend, MoaiChips } from "../drift/gantt";
 
 export default function NarrativePage() {
   const [data, setData] = useState<{
@@ -70,21 +70,30 @@ export default function NarrativePage() {
   return (
     <main className="flex-1 px-4 py-8 sm:px-6">
       <div className="mx-auto max-w-7xl">
-        <div className="mb-5">
-          <h1 className="text-2xl font-semibold tracking-tight">{COPY[initialLanguage()].narrative_title}</h1>
-          <p className="mt-1 text-sm text-muted-foreground">
-            {COPY[initialLanguage()].narrative_count.replace("{n}", String(eventCount)).replace("{s}", String(entries.length))}
+        <div>
+          <h1 className="font-display text-3xl">{COPY[initialLanguage()].narrative_title}</h1>
+          <p className="mt-1.5 text-sm text-muted-foreground tnum">
+            {COPY[initialLanguage()].narrative_count
+              .replace("{n}", String(eventCount))
+              .replace("{s}", String(entries.length))}
           </p>
         </div>
 
-        <div className="space-y-8">
+        <div className="mt-8 space-y-10">
           {entries.map(({ name, narrative, events }) => (
             <DriftGantt
               key={name}
               driftKey={name}
               events={events}
               moais={moais}
-              description={COPY[initialLanguage()].narrative_observer.replace("{o}", narrative.observer).replace("{t}", narrative.subject.join(" · "))}
+              description={
+                <>
+                  <span>{COPY[initialLanguage()].narrative_observer_label}</span>
+                  <MoaiChips names={[narrative.observer]} moais={moais} />
+                  <span>{COPY[initialLanguage()].narrative_subjects_label}</span>
+                  <MoaiChips names={narrative.subject} moais={moais} />
+                </>
+              }
             />
           ))}
         </div>
