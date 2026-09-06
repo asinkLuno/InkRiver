@@ -1,6 +1,6 @@
 import { lazy, Suspense, useCallback, useEffect, useState } from "react";
 import type { UnlistenFn } from "@tauri-apps/api/event";
-import { Clock3, FileText, FileX, FolderOpen } from "lucide-react";
+import { FileX, FolderOpen } from "lucide-react";
 import {
   NavigationMenu,
   NavigationMenuItem,
@@ -59,6 +59,74 @@ const PAGES: Record<string, React.ComponentType> = {
 
 const RECENT_STORIES_KEY = "weft.recentStories";
 const MAX_RECENT_STORIES = 5;
+
+/* landing 的织线开场：虚线是经线，粗线是纬线，转折处打结。
+ * 线的语言来自 logo，事件结随梭子经过依次落定。 */
+const WEFT_VERTICES: Array<[number, number]> = [
+  [110, 135],
+  [230, 55],
+  [350, 135],
+  [470, 15],
+  [590, 95],
+  [710, 15],
+  [830, 95],
+];
+const WEFT_KNOT_DELAYS = [
+  "0.36s",
+  "0.55s",
+  "0.77s",
+  "0.98s",
+  "1.17s",
+  "1.37s",
+  "1.56s",
+];
+
+function LandingWeave() {
+  return (
+    <svg
+      viewBox="0 0 960 150"
+      fill="none"
+      aria-hidden="true"
+      className="h-auto w-full text-primary"
+    >
+      {[15, 55, 95, 135].map((y) => (
+        <line
+          key={y}
+          x1="0"
+          y1={y}
+          x2="960"
+          y2={y}
+          stroke="currentColor"
+          strokeOpacity="0.18"
+          strokeWidth="1.5"
+          strokeDasharray="7 7"
+        />
+      ))}
+      <path
+        d="M0 15 L110 135 L230 55 L350 135 L470 15 L590 95 L710 15 L830 95 L960 15"
+        pathLength={1}
+        stroke="currentColor"
+        strokeWidth="6"
+        strokeLinejoin="round"
+        strokeLinecap="round"
+        className="weft-draw"
+      />
+      {WEFT_VERTICES.map(([cx, cy], index) => (
+        <circle
+          key={cx}
+          cx={cx}
+          cy={cy}
+          r={index % 2 === 0 ? 6 : 8}
+          className="weft-knot"
+          style={{ animationDelay: WEFT_KNOT_DELAYS[index] }}
+          fill={index % 2 === 0 ? "currentColor" : "var(--background)"}
+          stroke="currentColor"
+          strokeWidth={index % 2 === 0 ? 0 : 3.5}
+        />
+      ))}
+    </svg>
+  );
+}
 
 function loadRecentStories(): OpenedStory[] {
   try {
@@ -358,54 +426,49 @@ export function App() {
   if (!hasStory) {
     return (
       <>
-        <main className="flex min-h-screen items-center justify-center px-6 py-12">
-          <div className="w-full max-w-lg">
-            <div className="text-center">
-              <img
-                src="/logo-icon.svg"
-                alt="WEFT"
-                width={40}
-                height={40}
-                className="mx-auto mb-6"
-              />
-              <h1 className="text-2xl font-semibold tracking-tight">
-                {COPY[language].landing_title}
-              </h1>
-              <p className="mt-2 text-sm leading-6 text-muted-foreground">
-                {COPY[language].landing_description}
-              </p>
-              <div className="mt-8 rounded-xl border border-dashed bg-card/50 px-8 py-10">
-                <FileText className="mx-auto mb-4 size-10 text-muted-foreground" />
-                <p className="mb-5 text-sm text-muted-foreground">
-                  {COPY[language].landing_formats}
-                </p>
-                <Button
-                  type="button"
-                  size="lg"
-                  onClick={handleOpenStory}
-                  disabled={opening}
-                >
-                  <FolderOpen data-icon="inline-start" />
-                  {opening ? COPY[language].landing_opening : COPY[language].landing_choose}
-                </Button>
-              </div>
-            </div>
+        <main className="mx-auto flex min-h-screen w-full max-w-2xl flex-col px-6 py-12 sm:py-16">
+          <LandingWeave />
+          <div className="mt-10">
+            <h1 className="font-heading text-3xl font-semibold tracking-tight">
+              {COPY[language].landing_title}
+            </h1>
+            <p className="mt-3 text-base leading-7">
+              {COPY[language].landing_tagline}
+            </p>
+            <p className="mt-2 text-sm leading-6 text-muted-foreground">
+              {COPY[language].landing_description}
+            </p>
+          </div>
 
-            <section className="mt-8" aria-labelledby="recent-stories-heading">
-              <h2
-                id="recent-stories-heading"
-                className="mb-3 flex items-center gap-2 text-sm font-medium"
-              >
-                <Clock3 className="size-4 text-muted-foreground" />
-                {COPY[language].landing_recent}
-              </h2>
-              {recentStories.length > 0 ? (
-                <div className="overflow-hidden rounded-xl border bg-card">
-                  {recentStories.map((story) => (
+          <div className="mt-10 rounded-lg border border-dashed border-ring/40 bg-card/60 px-8 py-10 text-center">
+            <p className="mb-6 font-mono text-xs tracking-wide text-muted-foreground">
+              {COPY[language].landing_formats}
+            </p>
+            <Button
+              type="button"
+              size="lg"
+              onClick={handleOpenStory}
+              disabled={opening}
+            >
+              <FolderOpen data-icon="inline-start" />
+              {opening ? COPY[language].landing_opening : COPY[language].landing_choose}
+            </Button>
+          </div>
+
+          <section className="mt-10" aria-labelledby="recent-stories-heading">
+            <h2
+              id="recent-stories-heading"
+              className="font-heading text-lg font-semibold"
+            >
+              {COPY[language].landing_recent}
+            </h2>
+            {recentStories.length > 0 ? (
+              <ul className="mt-2 divide-y divide-border/70">
+                {recentStories.map((story) => (
+                  <li key={story.path}>
                     <button
-                      key={story.path}
                       type="button"
-                      className="block w-full border-b px-4 py-3 text-left transition-colors last:border-b-0 hover:bg-accent disabled:opacity-50"
+                      className="-mx-3 block w-full rounded-sm px-3 py-3 text-left transition-colors hover:bg-accent disabled:opacity-50"
                       onClick={() => handleOpenRecent(story)}
                       disabled={opening}
                     >
@@ -413,26 +476,26 @@ export function App() {
                         {story.title}
                       </span>
                       <span
-                        className="mt-1 block truncate text-xs text-muted-foreground"
+                        className="mt-0.5 block truncate font-mono text-xs text-muted-foreground"
                         title={story.path}
                       >
                         {story.path}
                       </span>
                     </button>
-                  ))}
-                </div>
-              ) : (
-                <p className="rounded-xl border border-dashed px-4 py-5 text-center text-sm text-muted-foreground">
-                  {COPY[language].landing_no_recent}
-                </p>
-              )}
-            </section>
-            {openError && (
-              <p className="mt-4 text-sm text-destructive" role="alert">
-                {COPY[language].landing_open_failed}: {openError}
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p className="mt-3 text-sm text-muted-foreground">
+                {COPY[language].landing_no_recent}
               </p>
             )}
-          </div>
+          </section>
+          {openError && (
+            <p className="mt-6 text-sm text-destructive" role="alert">
+              {COPY[language].landing_open_failed}: {openError}
+            </p>
+          )}
         </main>
         {dialogs}
       </>
@@ -491,7 +554,7 @@ export function App() {
         <header className="flex flex-wrap items-center gap-x-6 gap-y-2 border-b border-border px-4 py-3 sm:flex-nowrap sm:px-6">
           <a
             href="#/story"
-            className="flex items-center gap-2 text-lg font-semibold tracking-wide"
+            className="flex items-center gap-2 font-heading text-lg font-semibold tracking-wide"
           >
             <img src="/logo-icon.svg" alt="WEFT" width={20} height={20} />
             WEFT
@@ -526,7 +589,7 @@ export function App() {
                 title={appState?.story_path ?? fileName}
               >
                 <span
-                  className="size-1.5 rounded-full bg-emerald-500"
+                  className="size-1.5 rounded-full bg-success"
                   aria-label={COPY[language].landing_watching}
                 />
                 <span className="truncate">{fileName}</span>
