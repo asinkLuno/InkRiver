@@ -4,12 +4,31 @@
 
 @custom-variant dark (&:is(.dark *));
 
+/*
+ * 织房 The Loom — WEFT 的视觉基调。
+ *
+ * WEFT 即纬线：经线（warp）承载实体与时间刻度，纬线（weft）是穿行其间的
+ * 事件，转折处打结。配色取自染线——靛蓝为主，茜红示警，铜绿示安，
+ * 栀子黄与紫胶供图表区分；基底是浆过的生丝白，夜间是深靛的织房。
+ *
+ * 字体三种职责，互不混用：
+ *   衬线（宋体系）只做标题，给书卷气；
+ *   黑体做界面正文；
+ *   等宽给 YAML 路径、时间刻度与历法名——档案感。
+ */
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: system-ui, sans-serif;
-  --font-mono: ui-monospace, monospace;
-  --font-heading: system-ui, sans-serif;
+  --font-sans:
+    system-ui, -apple-system, "Segoe UI", Roboto, "PingFang SC",
+    "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans CJK SC", sans-serif;
+  --font-mono:
+    ui-monospace, "SF Mono", "Cascadia Mono", "JetBrains Mono", Menlo, Consolas,
+    "Noto Sans Mono CJK SC", monospace;
+  --font-heading:
+    "Iowan Old Style", "Palatino Linotype", Charter, Georgia, "Songti SC",
+    "Noto Serif CJK SC", "Source Han Serif SC", "Source Han Serif TC", SimSun,
+    serif;
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -23,6 +42,7 @@
   --color-chart-3: var(--chart-3);
   --color-chart-2: var(--chart-2);
   --color-chart-1: var(--chart-1);
+  --color-success: var(--success);
   --color-ring: var(--ring);
   --color-input: var(--input);
   --color-border: var(--border);
@@ -49,72 +69,79 @@
 }
 
 :root {
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
+  --background: oklch(0.988 0.005 95);
+  --foreground: oklch(0.24 0.018 260);
   --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
+  --card-foreground: oklch(0.24 0.018 260);
   --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.539 0.2797 264.35);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.539 0.2797 264.35);
-  --chart-1: oklch(0.646 0.222 41.116);
-  --chart-2: oklch(0.6 0.118 184.704);
-  --chart-3: oklch(0.398 0.07 227.392);
-  --chart-4: oklch(0.828 0.189 84.429);
-  --chart-5: oklch(0.769 0.188 70.08);
-  --radius: 0.625rem;
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.539 0.2797 264.35);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.539 0.2797 264.35);
+  --popover-foreground: oklch(0.24 0.018 260);
+  /* 靛蓝染：低饱和的深靛，不是荧光蓝 */
+  --primary: oklch(0.44 0.085 250);
+  --primary-foreground: oklch(0.988 0.005 95);
+  --secondary: oklch(0.958 0.006 95);
+  --secondary-foreground: oklch(0.28 0.015 260);
+  --muted: oklch(0.958 0.006 95);
+  --muted-foreground: oklch(0.5 0.02 255);
+  --accent: oklch(0.945 0.012 245);
+  --accent-foreground: oklch(0.3 0.04 250);
+  /* 茜草红 */
+  --destructive: oklch(0.5 0.17 22);
+  --border: oklch(0.906 0.008 95);
+  --input: oklch(0.88 0.01 95);
+  --ring: oklch(0.44 0.085 250);
+  /* 铜绿：成功与「正在监听」 */
+  --success: oklch(0.52 0.075 175);
+  /* 染料五色：靛蓝、茜红、栀子黄、铜绿、紫胶 */
+  --chart-1: oklch(0.44 0.085 250);
+  --chart-2: oklch(0.55 0.13 25);
+  --chart-3: oklch(0.7 0.12 85);
+  --chart-4: oklch(0.52 0.075 175);
+  --chart-5: oklch(0.48 0.07 310);
+  --radius: 0.4rem;
+  --sidebar: oklch(0.98 0.005 95);
+  --sidebar-foreground: oklch(0.24 0.018 260);
+  --sidebar-primary: oklch(0.44 0.085 250);
+  --sidebar-primary-foreground: oklch(0.988 0.005 95);
+  --sidebar-accent: oklch(0.945 0.012 245);
+  --sidebar-accent-foreground: oklch(0.3 0.04 250);
+  --sidebar-border: oklch(0.906 0.008 95);
+  --sidebar-ring: oklch(0.44 0.085 250);
 }
 
+/* 夜织房：深靛缸底，线色转为月下亮靛 */
 .dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.145 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.145 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.539 0.2797 264.35);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.396 0.141 25.723);
-  --border: oklch(0.269 0 0);
-  --input: oklch(0.269 0 0);
-  --ring: oklch(0.539 0.2797 264.35);
-  --chart-1: oklch(0.488 0.243 264.376);
-  --chart-2: oklch(0.696 0.17 162.48);
-  --chart-3: oklch(0.769 0.188 70.08);
-  --chart-4: oklch(0.627 0.265 303.9);
-  --chart-5: oklch(0.645 0.246 16.439);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.539 0.2797 264.35);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(0.269 0 0);
-  --sidebar-ring: oklch(0.539 0.2797 264.35);
+  --background: oklch(0.17 0.012 255);
+  --foreground: oklch(0.93 0.008 95);
+  --card: oklch(0.205 0.014 255);
+  --card-foreground: oklch(0.93 0.008 95);
+  --popover: oklch(0.205 0.014 255);
+  --popover-foreground: oklch(0.93 0.008 95);
+  --primary: oklch(0.76 0.085 245);
+  --primary-foreground: oklch(0.17 0.012 255);
+  --secondary: oklch(0.26 0.014 255);
+  --secondary-foreground: oklch(0.93 0.008 95);
+  --muted: oklch(0.26 0.014 255);
+  --muted-foreground: oklch(0.68 0.015 250);
+  --accent: oklch(0.28 0.02 250);
+  --accent-foreground: oklch(0.93 0.008 95);
+  --destructive: oklch(0.66 0.15 22);
+  --border: oklch(0.28 0.012 255);
+  --input: oklch(0.3 0.012 255);
+  --ring: oklch(0.76 0.085 245);
+  --success: oklch(0.74 0.09 175);
+  --chart-1: oklch(0.72 0.09 245);
+  --chart-2: oklch(0.66 0.13 25);
+  --chart-3: oklch(0.76 0.12 85);
+  --chart-4: oklch(0.7 0.09 175);
+  --chart-5: oklch(0.66 0.08 310);
+  --sidebar: oklch(0.19 0.012 255);
+  --sidebar-foreground: oklch(0.93 0.008 95);
+  --sidebar-primary: oklch(0.76 0.085 245);
+  --sidebar-primary-foreground: oklch(0.17 0.012 255);
+  --sidebar-accent: oklch(0.28 0.02 250);
+  --sidebar-accent-foreground: oklch(0.93 0.008 95);
+  --sidebar-border: oklch(0.28 0.012 255);
+  --sidebar-ring: oklch(0.76 0.085 245);
 }
 
 @layer base {
@@ -142,5 +169,29 @@
   .render-lazily {
     content-visibility: auto;
     contain-intrinsic-size: auto 500px;
+  }
+}
+
+/* landing 织线开场：纬线从左织到右，线结随梭子依次落定。
+ * 只此一处动效；reduced-motion 时整幅静态呈现。 */
+@media (prefers-reduced-motion: no-preference) {
+  .weft-draw {
+    stroke-dasharray: 1;
+    stroke-dashoffset: 1;
+    animation: weft-draw 1.6s cubic-bezier(0.65, 0, 0.35, 1) 0.15s forwards;
+  }
+  .weft-knot {
+    opacity: 0;
+    animation: weft-knot 0.4s ease-out forwards;
+  }
+}
+@keyframes weft-draw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+@keyframes weft-knot {
+  to {
+    opacity: 1;
   }
 }

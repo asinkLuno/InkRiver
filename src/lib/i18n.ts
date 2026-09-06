@@ -7,6 +7,7 @@ export const COPY = {
     /* 首页 */
     landing_title: "打开一个 WEFT 故事",
     landing_description: "选择 YAML 文件后，即可查看故事、moai、drift 和叙事时间线。",
+    landing_tagline: "把故事的经纬，织成看得见的纹样。",
     landing_formats: "支持 .yaml 和 .yml 文件",
     landing_choose: "选择 YAML 文件",
     landing_opening: "正在打开…",
@@ -130,6 +131,7 @@ export const COPY = {
     landing_title: "開啟 WEFT 故事",
     landing_description:
       "選擇 YAML 檔案後，即可檢視故事、moai、drift 和敘事時間線。",
+    landing_tagline: "把故事的經緯，織成看得見的紋樣。",
     landing_formats: "支援 .yaml 和 .yml 檔案",
     landing_choose: "選擇 YAML 檔案",
     landing_opening: "正在開啟…",
@@ -252,6 +254,7 @@ export const COPY = {
     /* 首 */
     landing_title: "啟 WEFT 故事",
     landing_description: "揀 YAML 檔，以觀故事、Moai、Drift、敍事之時序。",
+    landing_tagline: "經緯相織，故事成紋。",
     landing_formats: "唯 .yaml .yml 可用",
     landing_choose: "選 YAML 檔",
     landing_opening: "啟中…",
@@ -374,6 +377,7 @@ export const COPY = {
     landing_title: "WEFT ストーリーを開く",
     landing_description:
       "YAML ファイルを選択すると、ストーリー、moai、drift、ナラティブタイムラインを表示できます。",
+    landing_tagline: "人物を縦糸に、時を横糸に——物語を織物として映します。",
     landing_formats: ".yaml および .yml ファイルに対応",
     landing_choose: "YAML ファイルを選択",
     landing_opening: "開いています…",
@@ -498,6 +502,7 @@ export const COPY = {
     landing_title: "Malfermi WEFT-rakonton",
     landing_description:
       "Elektu YAML-dosieron por esplori ĝian rakonton, moai-ojn, drift-ojn, kaj narrativan templinion.",
+    landing_tagline: "Teksu la fadenojn de via rakonto — la ŝtoco fariĝas videbla.",
     landing_formats: "Subtenas .yaml kaj .yml dosierojn",
     landing_choose: "Elekti YAML-dosieron",
     landing_opening: "Malfermante…",
@@ -622,6 +627,7 @@ export const COPY = {
     landing_title: "Open a WEFT story",
     landing_description:
       "Choose a YAML file to explore its story, moai, drifts, and narrative timeline.",
+    landing_tagline: "Entities as the warp, time as the weft — your story, woven into view.",
     landing_formats: "Supports .yaml and .yml files",
     landing_choose: "Choose YAML file",
     landing_opening: "Opening…",

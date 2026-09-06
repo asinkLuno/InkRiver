@@ -1,14 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { CalendarDays } from "lucide-react";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { PageError, PageLoading } from "@/components/page-state";
 import { COPY, initialLanguage } from "@/lib/i18n";
@@ -54,48 +46,44 @@ export default function StoryPage() {
   const { story, calendar } = data;
 
   return (
-    <main className="flex-1 px-6 py-8">
-      <div className="mx-auto max-w-3xl space-y-6">
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-2xl">{story.title}</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            {story.description && (
-              <div className="prose prose-sm max-w-none text-muted-foreground">
-                {story.description}
-              </div>
-            )}
-          </CardContent>
-        </Card>
+    <main className="flex-1 px-6 py-10 sm:py-14">
+      <div className="mx-auto max-w-3xl">
+        {/* 卷首：书页式版面，标题与描述之间只留呼吸，不留卡片 */}
+        <section aria-labelledby="story-title">
+          <h1 id="story-title" className="font-heading text-4xl font-semibold tracking-tight">
+            {story.title}
+          </h1>
+          {story.description && (
+            <p className="mt-5 max-w-prose text-[15px] leading-8 text-muted-foreground">
+              {story.description}
+            </p>
+          )}
+        </section>
 
-        <Card>
-          <CardHeader>
-            <div className="flex items-start justify-between gap-4">
-              <div>
-                <CardDescription className="mb-1 flex items-center gap-2">
-                  <CalendarDays className="size-4" aria-hidden="true" />
-                  {COPY[initialLanguage()].story_calendar}
-                </CardDescription>
-                <CardTitle>{calendar.title}</CardTitle>
-              </div>
-              <Badge variant="secondary">
-                {calendar.source === "builtin" ? COPY[initialLanguage()].story_builtin : COPY[initialLanguage()].story_plugin}
-              </Badge>
-            </div>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            {calendar.description && (
-              <p className="text-sm leading-6 text-muted-foreground">
-                {calendar.description}
-              </p>
-            )}
-            <dl className="grid gap-3 text-sm sm:grid-cols-[8rem_1fr]">
-              <dt className="text-muted-foreground">{COPY[initialLanguage()].story_mode}</dt>
-              <dd className="font-mono text-xs">{calendar.name}</dd>
-            </dl>
-          </CardContent>
-        </Card>
+        <section
+          aria-labelledby="calendar-title"
+          className="mt-10 border-t border-border pt-8"
+        >
+          <div className="flex flex-wrap items-baseline justify-between gap-3">
+            <h2
+              id="calendar-title"
+              className="font-heading text-xl font-semibold"
+            >
+              {COPY[initialLanguage()].story_calendar}
+            </h2>
+            <Badge variant="secondary">
+              {calendar.source === "builtin" ? COPY[initialLanguage()].story_builtin : COPY[initialLanguage()].story_plugin}
+            </Badge>
+          </div>
+          <p className="mt-3 max-w-prose text-sm leading-6 text-muted-foreground">
+            {calendar.title}
+            {calendar.description ? `——${calendar.description}` : ""}
+          </p>
+          <dl className="mt-5 grid gap-y-2.5 text-sm sm:grid-cols-[8rem_1fr] sm:gap-x-6">
+            <dt className="text-muted-foreground">{COPY[initialLanguage()].story_mode}</dt>
+            <dd className="font-mono text-xs leading-6">{calendar.name}</dd>
+          </dl>
+        </section>
       </div>
     </main>
   );
