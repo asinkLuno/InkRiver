@@ -40,7 +40,7 @@ export function EventHoverCard({
       >
         <div className="space-y-3">
           <div>
-            <h3 className="text-base leading-snug font-semibold">{title}</h3>
+            <h3 className="font-display text-base leading-snug font-medium">{title}</h3>
             <div className="mt-1.5 flex items-start gap-2 font-mono text-xs text-muted-foreground">
               <CalendarRangeIcon className="mt-0.5 size-3.5 shrink-0" />
               <span>
@@ -51,7 +51,7 @@ export function EventHoverCard({
           </div>
 
           {description && (
-            <p className="whitespace-pre-wrap break-words border-t pt-3 text-sm leading-relaxed">
+            <p className="font-display text-[0.95rem] leading-7 whitespace-pre-wrap break-words border-t pt-3">
               {description}
             </p>
           )}

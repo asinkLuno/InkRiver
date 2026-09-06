@@ -20,6 +20,7 @@ import {
 import { drag } from "d3-drag";
 import { Focus, LocateFixed, Minus, Plus, Search, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { PageHeader } from "@/components/page-header";
 import type { GraphLink, GraphNode, LinkGraph, MoaiMap } from "@/lib/api";
 import { useCopy } from "@/lib/i18n";
 
@@ -192,7 +193,7 @@ function GraphSection({ graph, moais }: { graph: SubGraph; moais: MoaiMap }) {
       .attr("orient", "auto-start-reverse")
       .append("path")
       .attr("d", "M0,-5L10,0L0,5")
-      .attr("fill", "#525252");
+      .style("fill", "var(--muted-foreground)");
 
     const linkGroups = canvas
       .append("g")
@@ -204,8 +205,8 @@ function GraphSection({ graph, moais }: { graph: SubGraph; moais: MoaiMap }) {
     const paths = linkGroups
       .append("path")
       .attr("fill", "none")
-      .attr("stroke", "#525252")
-      .attr("stroke-opacity", 0.8)
+      .style("stroke", "var(--muted-foreground)")
+      .attr("stroke-opacity", 0.65)
       .attr("stroke-width", 1.5)
       .attr("marker-end", `url(#${markerId})`)
       .attr("marker-start", (link) =>
@@ -217,10 +218,10 @@ function GraphSection({ graph, moais }: { graph: SubGraph; moais: MoaiMap }) {
       .attr("text-anchor", "middle")
       .attr("dy", -5)
       .attr("font-size", 10)
-      .attr("fill", "#404040")
+      .style("fill", "var(--muted-foreground)")
       .attr("paint-order", "stroke")
-      .attr("stroke", "#fafafa")
-      .attr("stroke-width", 4)
+      .style("stroke", "var(--background)")
+      .attr("stroke-width", 3)
       .attr("stroke-linejoin", "round")
       .text((link) => link.relations);
 
@@ -240,16 +241,21 @@ function GraphSection({ graph, moais }: { graph: SubGraph; moais: MoaiMap }) {
       .append("circle")
       .attr("r", NODE_RADIUS)
       .style("fill", "var(--primary)")
-      .attr("stroke", "#fafafa")
-      .attr("stroke-width", 1.5);
+      .style("stroke", "var(--background)")
+      .attr("stroke-width", 2);
 
+    // Names sit below the stone: CJK names don't fit inside a 20px circle.
     nodeGroups
       .append("text")
       .attr("text-anchor", "middle")
-      .attr("dy", ".32em")
-      .attr("font-family", "Arial, sans-serif")
-      .attr("font-size", 10)
-      .attr("fill", "#fafafa")
+      .attr("dy", NODE_RADIUS + 16)
+      .attr("font-size", 11)
+      .style("font-family", "var(--font-sans)")
+      .style("fill", "var(--foreground)")
+      .attr("paint-order", "stroke")
+      .style("stroke", "var(--background)")
+      .attr("stroke-width", 3)
+      .attr("stroke-linejoin", "round")
       .attr("pointer-events", "none")
       .text((node) => node.name);
 
@@ -400,8 +406,8 @@ function GraphSection({ graph, moais }: { graph: SubGraph; moais: MoaiMap }) {
     <section className="space-y-3">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <div>
-          <h2 className="text-lg font-semibold">{graph.label}</h2>
-          <p className="text-xs text-muted-foreground">
+          <h2 className="font-display text-lg font-medium">{graph.label}</h2>
+          <p className="mt-0.5 font-mono text-xs text-muted-foreground">
             {copy.graph_node_count.replace("{n}", String(graph.nodes.length)).replace("{l}", String(graph.links.length))}
           </p>
         </div>
@@ -415,7 +421,7 @@ function GraphSection({ graph, moais }: { graph: SubGraph; moais: MoaiMap }) {
               placeholder={copy.graph_search_placeholder}
               aria-label={copy.graph_search_placeholder}
               list={`nodes-${markerIdRef.current}`}
-              className="h-8 w-40 rounded-lg border border-input bg-background pr-2 pl-8 text-sm outline-none focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/40"
+              className="h-8 w-40 rounded-md border border-input bg-card pr-2 pl-8 text-sm outline-none focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/40"
             />
             <datalist id={`nodes-${markerIdRef.current}`}>
               {graph.nodes.map((node) => (
@@ -496,14 +502,14 @@ function GraphSection({ graph, moais }: { graph: SubGraph; moais: MoaiMap }) {
           >
             <X />
           </Button>
-          <h3 className="pr-8 text-base font-semibold">{selectedMoai.name}</h3>
+          <h3 className="pr-8 font-display text-base font-medium">{selectedMoai.name}</h3>
           {selectedMoai.base_time_display && (
             <p className="mt-1 font-mono text-xs text-muted-foreground">
               {selectedMoai.base_time_display}
             </p>
           )}
           {selectedMoai.description && (
-            <p className="mt-3 max-w-3xl whitespace-pre-wrap text-muted-foreground">
+            <p className="mt-3 max-w-3xl font-display text-[0.95rem] leading-7 whitespace-pre-wrap text-muted-foreground">
               {selectedMoai.description}
             </p>
           )}
@@ -529,14 +535,13 @@ export function MoaiLinkGraph({
   if (!activeGraph) return null;
 
   return (
-    <main className="flex flex-1 flex-col px-4 py-6 sm:px-6">
+    <main className="flex flex-1 flex-col px-4 py-8 sm:px-6">
       <div className="mx-auto w-full max-w-7xl">
-        <div className="mb-5">
-          <h1 className="text-2xl font-semibold tracking-tight">{copy.graph_title}</h1>
+        <PageHeader title={copy.graph_title}>
           <p className="mt-1 text-sm text-muted-foreground">
             {copy.graph_subtitle}
           </p>
-        </div>
+        </PageHeader>
         {subGraphs.length > 1 && (
           <div
             className="mb-5 flex gap-1 overflow-x-auto border-b pb-px"
@@ -552,14 +557,14 @@ export function MoaiLinkGraph({
                   role="tab"
                   aria-selected={active}
                   onClick={() => setActiveLabel(graph.label)}
-                  className={`shrink-0 border-b-2 px-3 py-2 text-sm font-medium transition-colors ${
+                  className={`relative shrink-0 px-3 py-2 text-sm font-medium transition-colors after:absolute after:inset-x-3 after:bottom-0 after:h-0.5 after:bg-primary after:content-[''] after:transition-opacity ${
                     active
-                      ? "border-primary text-foreground"
-                      : "border-transparent text-muted-foreground hover:text-foreground"
+                      ? "text-foreground after:opacity-100"
+                      : "text-muted-foreground after:opacity-0 hover:text-foreground"
                   }`}
                 >
                   {graph.label}
-                  <span className="ml-1.5 text-xs opacity-60">
+                  <span className="ml-1.5 font-mono text-xs opacity-60">
                     {graph.links.length}
                   </span>
                 </button>

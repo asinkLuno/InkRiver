@@ -11,6 +11,7 @@ import {
   type MoaiMap,
 } from "@/lib/api";
 import { compareDriftTime, DriftGantt, GanttLegend } from "./gantt";
+import { PageHeader } from "@/components/page-header";
 
 export default function DriftPage() {
   const [data, setData] = useState<{
@@ -66,12 +67,10 @@ export default function DriftPage() {
   return (
     <main className="flex-1 px-4 py-8 sm:px-6">
       <div className="mx-auto max-w-7xl">
-        <div className="mb-5">
-          <h1 className="text-2xl font-semibold tracking-tight">{copy.drift_title}</h1>
-          <p className="mt-1 text-sm text-muted-foreground">
-            {copy.drift_count.replace("{n}", String(events.length)).replace("{s}", String(entries.length))}
-          </p>
-        </div>
+        <PageHeader
+          title={copy.drift_title}
+          meta={copy.drift_count.replace("{n}", String(events.length)).replace("{s}", String(entries.length))}
+        />
 
         <div className="space-y-8">
           {entries.map(({ key, events: driftEvents }) => (

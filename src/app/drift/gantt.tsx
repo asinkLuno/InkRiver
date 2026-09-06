@@ -46,7 +46,7 @@ export function DriftGantt({
     <section aria-labelledby={`gantt-${driftKey}`} className="render-lazily">
       {showHeader ? (
         <div className="mb-2 flex flex-wrap items-baseline gap-x-3 gap-y-1">
-          <h2 id={`gantt-${driftKey}`} className="text-lg font-semibold">
+          <h2 id={`gantt-${driftKey}`} className="font-display text-lg font-medium">
             {driftKey}
           </h2>
           {description && (
@@ -59,7 +59,7 @@ export function DriftGantt({
         </h3>
       )}
       <div className="overflow-x-auto">
-        <div className="min-w-[900px] overflow-hidden rounded-lg border bg-background">
+        <div className="min-w-[900px] overflow-hidden rounded-lg border bg-card">
           <div className="grid grid-cols-[240px_1fr] border-b bg-muted/50">
             <div className="flex h-14 items-end border-r px-4 pb-2 text-xs font-medium text-muted-foreground">
               {copy.gantt_event}
@@ -98,7 +98,7 @@ export function DriftGantt({
                     trigger={
                       <button
                         type="button"
-                        className="block w-full truncate rounded-sm text-left text-sm font-medium outline-none hover:underline focus-visible:ring-2 focus-visible:ring-ring/50"
+                        className="block w-full truncate rounded-sm text-left font-display text-sm font-medium outline-none hover:underline focus-visible:ring-2 focus-visible:ring-ring/50"
                       >
                         {event.title}
                       </button>
@@ -114,7 +114,7 @@ export function DriftGantt({
                   </div>
                 </div>
 
-                <div className="relative bg-[linear-gradient(to_right,var(--border)_1px,transparent_1px)] bg-[size:25%_100%]">
+                <div className="relative bg-[linear-gradient(to_right,color-mix(in_oklab,var(--border)_55%,transparent)_1px,transparent_1px)] bg-[size:25%_100%]">
                   <EventHoverCard
                     {...cardProps}
                     trigger={
@@ -130,7 +130,7 @@ export function DriftGantt({
                       ) : (
                         <button
                           type="button"
-                          className="absolute top-1/2 h-7 min-w-1 -translate-y-1/2 rounded-md border border-primary/20 bg-primary/85 shadow-sm outline-none hover:bg-primary hover:ring-4 hover:ring-primary/15 focus-visible:ring-4 focus-visible:ring-ring/40"
+                          className="absolute top-1/2 h-6 min-w-1 -translate-y-1/2 rounded-[4px] border border-primary/25 bg-primary/85 shadow-sm outline-none hover:bg-primary hover:ring-4 hover:ring-primary/15 focus-visible:ring-4 focus-visible:ring-ring/40"
                           style={{ left: `${left}%`, width: `${width}%` }}
                           aria-label={event.title}
                         />
@@ -152,7 +152,7 @@ export function GanttLegend() {
   return (
     <div className="mt-3 flex items-center gap-5 text-xs text-muted-foreground">
       <span className="flex items-center gap-2">
-        <span className="h-2.5 w-5 rounded-sm bg-primary/85" /> {copy.gantt_duration}
+        <span className="h-2.5 w-5 rounded-[3px] bg-primary/85" /> {copy.gantt_duration}
       </span>
       <span className="flex items-center gap-2">
         <span className="size-2.5 rotate-45 rounded-[1px] bg-primary" />

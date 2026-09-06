@@ -90,7 +90,7 @@ export function QuickSwitcher({
                   className="block w-full rounded-md px-3 py-2 text-left hover:bg-accent"
                   onClick={() => onPick(story)}
                 >
-                  <span className="block truncate text-sm font-medium">
+                  <span className="block truncate font-display text-[0.95rem] font-medium">
                     {story.title}
                   </span>
                   <span

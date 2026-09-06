@@ -11,6 +11,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { DriftGantt, GanttLegend } from "../drift/gantt";
+import { PageHeader } from "@/components/page-header";
 
 export type MoaiGanttEntry = {
   key: string;
@@ -56,20 +57,19 @@ export function MoaiGantts({
 
   return (
     <>
-      <div className="mb-5">
-        <h1 className="text-2xl font-semibold tracking-tight">{copy.moai_title}</h1>
-        <p className="mt-1 text-sm text-muted-foreground">
-          {copy.moai_count.replace("{n}", String(filteredEntries.length)).replace("{t}", String(entries.length))}
-        </p>
+      <PageHeader
+        title={copy.moai_title}
+        meta={copy.moai_count.replace("{n}", String(filteredEntries.length)).replace("{t}", String(entries.length))}
+      >
         <input
           type="search"
           value={query}
           onChange={(event) => setQuery(event.target.value)}
           placeholder={copy.moai_search + "…"}
           aria-label={copy.moai_search}
-          className="mt-4 h-10 w-full max-w-md rounded-md border border-input bg-background px-3 text-sm outline-none placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/40"
+          className="mt-4 h-9 w-full max-w-md rounded-md border border-input bg-card px-3 text-sm outline-none placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/40"
         />
-      </div>
+      </PageHeader>
 
       {filteredEntries.length > 0 ? (
         <>
@@ -81,13 +81,13 @@ export function MoaiGantts({
                     <div className="min-w-0">
                       <CardTitle className="text-xl">{moai.name}</CardTitle>
                       {moai.description && (
-                        <CardDescription className="mt-2 max-w-4xl whitespace-pre-wrap leading-6">
+                        <CardDescription className="mt-2 max-w-4xl font-display text-[0.95rem] leading-7 whitespace-pre-wrap">
                           {moai.description}
                         </CardDescription>
                       )}
                     </div>
                     {moai.base_time_display && (
-                      <div className="shrink-0 rounded-md bg-muted px-3 py-1.5 font-mono text-xs text-muted-foreground">
+                      <div className="shrink-0 self-start rounded-sm bg-muted px-2.5 py-1 font-mono text-xs text-muted-foreground">
                         {moai.base_time_display}
                       </div>
                     )}
@@ -98,14 +98,14 @@ export function MoaiGantts({
                     <div className="grid gap-4 pt-1 md:grid-cols-2">
                       {moai.materials && moai.materials.length > 0 && (
                         <div>
-                          <h3 className="mb-2 text-xs font-medium tracking-wide text-muted-foreground uppercase">
+                          <h3 className="mb-2 text-xs font-medium text-muted-foreground">
                             {copy.moai_materials}
                           </h3>
                           <div className="flex flex-wrap gap-2">
                             {moai.materials.map((material) => (
                               <span
                                 key={material}
-                                className="rounded-full border bg-background px-2.5 py-1 text-xs"
+                                className="rounded-sm border bg-background px-2 py-0.5 text-xs"
                               >
                                 {material}
                               </span>

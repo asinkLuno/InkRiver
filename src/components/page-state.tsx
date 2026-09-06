@@ -31,7 +31,7 @@ export function PageError({
     <main className="flex flex-1 items-center justify-center px-6 py-12">
       <div className="max-w-md text-center" role="alert">
         <AlertCircle className="mx-auto size-8 text-destructive" />
-        <h1 className="mt-4 text-lg font-semibold">{heading}</h1>
+        <h1 className="mt-4 font-display text-lg font-medium">{heading}</h1>
         <p className="mt-2 break-words text-sm text-muted-foreground">
           {message}
         </p>

@@ -11,6 +11,7 @@ import {
   type NarrativeMap,
 } from "@/lib/api";
 import { compareDriftTime, DriftGantt, GanttLegend } from "../drift/gantt";
+import { PageHeader } from "@/components/page-header";
 
 export default function NarrativePage() {
   const [data, setData] = useState<{
@@ -71,12 +72,10 @@ export default function NarrativePage() {
   return (
     <main className="flex-1 px-4 py-8 sm:px-6">
       <div className="mx-auto max-w-7xl">
-        <div className="mb-5">
-          <h1 className="text-2xl font-semibold tracking-tight">{copy.narrative_title}</h1>
-          <p className="mt-1 text-sm text-muted-foreground">
-            {copy.narrative_count.replace("{n}", String(eventCount)).replace("{s}", String(entries.length))}
-          </p>
-        </div>
+        <PageHeader
+          title={copy.narrative_title}
+          meta={copy.narrative_count.replace("{n}", String(eventCount)).replace("{s}", String(entries.length))}
+        />
 
         <div className="space-y-8">
           {entries.map(({ name, narrative, events }) => (

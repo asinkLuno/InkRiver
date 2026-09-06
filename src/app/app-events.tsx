@@ -65,14 +65,14 @@ export function AppEvents({ onFileLost, language }: AppEventsProps) {
     <>
       {reloadedAt && (
         <div
-          className="flex items-center gap-2 border-b border-emerald-500/30 bg-emerald-500/10 px-6 py-2 text-sm"
+          className="flex items-center gap-2 border-b border-success/30 bg-success/10 px-6 py-2 text-sm"
           role="status"
         >
-          <CheckCircle2 className="size-4 text-emerald-600" />
+          <CheckCircle2 className="size-4 text-success" />
           <span>{COPY[language].event_reloaded} {reloadedAt}</span>
           <button
             type="button"
-            className="ml-auto rounded-sm p-1 text-muted-foreground hover:bg-emerald-500/10 hover:text-foreground"
+            className="ml-auto rounded-sm p-1 text-muted-foreground hover:bg-success/10 hover:text-foreground"
             onClick={() => setReloadedAt(null)}
             aria-label={COPY[language].event_dismiss}
           >
