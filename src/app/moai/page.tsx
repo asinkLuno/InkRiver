@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { PageError, PageLoading } from "@/components/page-state";
-import { COPY, initialLanguage } from "@/lib/i18n";
+import { useCopy } from "@/lib/i18n";
 import {
   getDrifts,
   getMoais,
@@ -19,6 +19,7 @@ export default function MoaiPage() {
     drifts: DriftMap;
   } | null>(null);
   const [error, setError] = useState<unknown>(null);
+  const copy = useCopy();
 
   useEffect(() => {
     let cancelled = false;
@@ -41,7 +42,7 @@ export default function MoaiPage() {
   }, []);
 
   if (error)
-    return <PageError title={COPY[initialLanguage()].error_load_moai} error={error} />;
+    return <PageError title={copy.error_load_moai} error={error} />;
   if (!data) return <PageLoading />;
 
   const { moais, drifts } = data;
@@ -62,7 +63,7 @@ export default function MoaiPage() {
   if (entries.length === 0) {
     return (
       <main className="flex flex-1 items-center justify-center text-muted-foreground">
-        <p>{COPY[initialLanguage()].moai_empty}</p>
+        <p>{copy.moai_empty}</p>
       </main>
     );
   }

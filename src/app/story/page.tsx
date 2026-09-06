@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { PageError, PageLoading } from "@/components/page-state";
-import { COPY, initialLanguage } from "@/lib/i18n";
+import { useCopy } from "@/lib/i18n";
 import {
   getCalendarMetadata,
   getStory,
@@ -26,6 +26,7 @@ export default function StoryPage() {
     calendar: CalendarMetadata;
   } | null>(null);
   const [error, setError] = useState<unknown>(null);
+  const copy = useCopy();
 
   useEffect(() => {
     let cancelled = false;
@@ -48,7 +49,7 @@ export default function StoryPage() {
   }, []);
 
   if (error)
-    return <PageError title={COPY[initialLanguage()].error_load_story} error={error} />;
+    return <PageError title={copy.error_load_story} error={error} />;
   if (!data) return <PageLoading />;
 
   const { story, calendar } = data;
@@ -75,12 +76,12 @@ export default function StoryPage() {
               <div>
                 <CardDescription className="mb-1 flex items-center gap-2">
                   <CalendarDays className="size-4" aria-hidden="true" />
-                  {COPY[initialLanguage()].story_calendar}
+                  {copy.story_calendar}
                 </CardDescription>
                 <CardTitle>{calendar.title}</CardTitle>
               </div>
               <Badge variant="secondary">
-                {calendar.source === "builtin" ? COPY[initialLanguage()].story_builtin : COPY[initialLanguage()].story_plugin}
+                {calendar.source === "builtin" ? copy.story_builtin : copy.story_plugin}
               </Badge>
             </div>
           </CardHeader>
@@ -91,7 +92,7 @@ export default function StoryPage() {
               </p>
             )}
             <dl className="grid gap-3 text-sm sm:grid-cols-[8rem_1fr]">
-              <dt className="text-muted-foreground">{COPY[initialLanguage()].story_mode}</dt>
+              <dt className="text-muted-foreground">{copy.story_mode}</dt>
               <dd className="font-mono text-xs">{calendar.name}</dd>
             </dl>
           </CardContent>

@@ -1,10 +1,10 @@
 import { Component, type ErrorInfo, type ReactNode } from "react";
 import { AlertCircle, LoaderCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { COPY, initialLanguage } from "@/lib/i18n";
+import { COPY, LanguageContext, useCopy } from "@/lib/i18n";
 
 export function PageLoading() {
-  const copy = COPY[initialLanguage()];
+  const copy = useCopy();
   return (
     <main
       className="flex flex-1 items-center justify-center px-6 py-12 text-muted-foreground"
@@ -23,7 +23,7 @@ export function PageError({
   title?: string;
   error: unknown;
 }) {
-  const copy = COPY[initialLanguage()];
+  const copy = useCopy();
   const message = error instanceof Error ? error.message : String(error);
   const heading = title ?? copy.page_error_default;
 
@@ -52,6 +52,9 @@ export class PageErrorBoundary extends Component<
   { children: ReactNode },
   { error: unknown }
 > {
+  static contextType = LanguageContext;
+  declare context: React.ContextType<typeof LanguageContext>;
+
   state: { error: unknown } = { error: null };
 
   static getDerivedStateFromError(error: unknown) {
@@ -66,7 +69,7 @@ export class PageErrorBoundary extends Component<
     if (this.state.error) {
       return (
         <PageError
-          title={COPY[initialLanguage()].page_error_render}
+          title={COPY[this.context].page_error_render}
           error={this.state.error}
         />
       );

@@ -1,5 +1,5 @@
 import type { Drift, MoaiMap } from "@/lib/api";
-import { COPY, initialLanguage } from "@/lib/i18n";
+import { useCopy } from "@/lib/i18n";
 import { EventHoverCard } from "./event-hover-card";
 
 export function compareDriftTime(a: Drift, b: Drift): number {
@@ -24,19 +24,22 @@ export function DriftGantt({
   description?: string;
   showHeader?: boolean;
 }) {
-  const minTick = Math.min(...events.map((event) => event.start_tick));
-  const maxTick = Math.max(
-    ...events.map((event) => event.end_tick ?? event.start_tick),
-  );
+  const copy = useCopy();
+  // Single pass for the range and first/last events: avoids the spread of
+  // Math.min/Math.max (which overflows on very large event lists) and the
+  // two extra array allocations from mapping before reducing.
+  let minTick = events[0].start_tick;
+  let maxTick = events[0].end_tick ?? events[0].start_tick;
+  let firstEvent = events[0];
+  let lastEvent = events[0];
+  for (const event of events) {
+    const endTick = event.end_tick ?? event.start_tick;
+    if (event.start_tick < minTick) minTick = event.start_tick;
+    if (endTick > maxTick) maxTick = endTick;
+    if (event.start_tick < firstEvent.start_tick) firstEvent = event;
+    if (endTick > (lastEvent.end_tick ?? lastEvent.start_tick)) lastEvent = event;
+  }
   const tickRange = Math.max(maxTick - minTick, 1);
-  const firstEvent = events.reduce((first, event) =>
-    event.start_tick < first.start_tick ? event : first,
-  );
-  const lastEvent = events.reduce((last, event) => {
-    const eventTick = event.end_tick ?? event.start_tick;
-    const lastTick = last.end_tick ?? last.start_tick;
-    return eventTick > lastTick ? event : last;
-  });
   const endDisplay = lastEvent.end_time_display ?? lastEvent.start_time_display;
 
   return (
@@ -59,7 +62,7 @@ export function DriftGantt({
         <div className="min-w-[900px] overflow-hidden rounded-lg border bg-background">
           <div className="grid grid-cols-[240px_1fr] border-b bg-muted/50">
             <div className="flex h-14 items-end border-r px-4 pb-2 text-xs font-medium text-muted-foreground">
-              {COPY[initialLanguage()].gantt_event}
+              {copy.gantt_event}
             </div>
             <div className="relative h-14 font-mono text-[11px] text-muted-foreground">
               <span className="absolute bottom-2 left-3">
@@ -145,14 +148,15 @@ export function DriftGantt({
 }
 
 export function GanttLegend() {
+  const copy = useCopy();
   return (
     <div className="mt-3 flex items-center gap-5 text-xs text-muted-foreground">
       <span className="flex items-center gap-2">
-        <span className="h-2.5 w-5 rounded-sm bg-primary/85" /> {COPY[initialLanguage()].gantt_duration}
+        <span className="h-2.5 w-5 rounded-sm bg-primary/85" /> {copy.gantt_duration}
       </span>
       <span className="flex items-center gap-2">
         <span className="size-2.5 rotate-45 rounded-[1px] bg-primary" />
-        {COPY[initialLanguage()].gantt_milestone}
+        {copy.gantt_milestone}
       </span>
     </div>
   );

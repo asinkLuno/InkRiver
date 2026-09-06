@@ -1,4 +1,4 @@
-import { lazy, Suspense, useCallback, useEffect, useState } from "react";
+import { lazy, Suspense, useCallback, useEffect, useEffectEvent, useState } from "react";
 import type { UnlistenFn } from "@tauri-apps/api/event";
 import { Clock3, FileText, FileX, FolderOpen } from "lucide-react";
 import {
@@ -30,8 +30,9 @@ import { emit, listen, openUrl } from "@/lib/platform";
 import {
   COPY,
   LANGUAGE_KEY,
-  initialLanguage,
+  LanguageProvider,
   formatErrorMessage,
+  initialLanguage,
   type Language,
 } from "@/lib/i18n";
 
@@ -131,54 +132,48 @@ export function App() {
     return () => window.removeEventListener("hashchange", navigate);
   }, [refreshAppState]);
 
-  useEffect(() => {
-    let unlisten: UnlistenFn | undefined;
-    let disposed = false;
-    listen<string>("weft-menu", (event) => {
-      switch (event.payload) {
-        case "open":
-          void handleOpenStory();
-          break;
-        case "open_recent":
-          setSwitcherOpen(true);
-          break;
-        case "close":
-          void handleCloseStory();
-          break;
-        case "reload":
-          void handleReload();
-          break;
-        case "preferences":
-          setSettingsOpen(true);
-          break;
-        case "help_docs":
-          openExternal("https://asinkluno.github.io/WEFT/");
-          break;
-        case "help_issue":
-          openExternal("https://github.com/asinkLuno/WEFT/issues");
-          break;
-      }
-    }).then((un) => {
-      if (disposed) un();
-      else unlisten = un;
-    });
-    return () => {
-      disposed = true;
-      unlisten?.();
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  // Effect events let the mount-only listeners below always see fresh state
+  // (e.g. the current language) without re-subscribing on every change.
+  const onMenuEvent = useEffectEvent((action: string) => {
+    switch (action) {
+      case "open":
+        void handleOpenStory();
+        break;
+      case "open_recent":
+        setSwitcherOpen(true);
+        break;
+      case "close":
+        void handleCloseStory();
+        break;
+      case "reload":
+        void handleReload();
+        break;
+      case "preferences":
+        setSettingsOpen(true);
+        break;
+      case "help_docs":
+        openExternal("https://asinkluno.github.io/WEFT/");
+        break;
+      case "help_issue":
+        openExternal("https://github.com/asinkLuno/WEFT/issues");
+        break;
+    }
+  });
+  const onDragEnter = useEffectEvent((path: string) => setDragPath(path));
+  const onDragDrop = useEffectEvent((rawPath: string) => {
+    setDragPath(null);
+    void handleDrop(rawPath);
+  });
+  const onDragLeave = useEffectEvent(() => setDragPath(null));
 
   useEffect(() => {
     const unlisteners: UnlistenFn[] = [];
     let disposed = false;
     Promise.all([
-      listen<string>("weft-drag-enter", (event) => setDragPath(event.payload)),
-      listen<string>("weft-drag-drop", (event) => {
-        setDragPath(null);
-        void handleDrop(event.payload);
-      }),
-      listen("weft-drag-leave", () => setDragPath(null)),
+      listen<string>("weft-menu", (event) => onMenuEvent(event.payload)),
+      listen<string>("weft-drag-enter", (event) => onDragEnter(event.payload)),
+      listen<string>("weft-drag-drop", (event) => onDragDrop(event.payload)),
+      listen("weft-drag-leave", () => onDragLeave()),
     ]).then((listeners) => {
       if (disposed) listeners.forEach((un) => un());
       else unlisteners.push(...listeners);
@@ -187,7 +182,6 @@ export function App() {
       disposed = true;
       unlisteners.forEach((un) => un());
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const Page = PAGES[path] ?? StoryPage;
@@ -486,60 +480,62 @@ export function App() {
 
   return (
     <>
-      <div className="min-h-screen flex flex-col">
-        <AppEvents onFileLost={onFileLost} language={language} />
-        <header className="flex flex-wrap items-center gap-x-6 gap-y-2 border-b border-border px-4 py-3 sm:flex-nowrap sm:px-6">
-          <a
-            href="#/story"
-            className="flex items-center gap-2 text-lg font-semibold tracking-wide"
-          >
-            <img src="/logo-icon.svg" alt="WEFT" width={20} height={20} />
-            WEFT
-          </a>
-          <NavigationMenu className="order-last min-w-0 max-w-none basis-full justify-start overflow-x-auto sm:order-none sm:basis-auto sm:overflow-visible">
-            <NavigationMenuList className="gap-1">
-              {NAV_ITEMS.map((item) => (
-                <NavigationMenuItem key={item.path}>
-                  <NavigationMenuLink
-                    href={`#${item.path}`}
-                    active={path === item.path}
-                    aria-current={path === item.path ? "page" : undefined}
-                  >
-                    {COPY[language][item.key as keyof typeof COPY[typeof language]]}
-                  </NavigationMenuLink>
-                </NavigationMenuItem>
-              ))}
-            </NavigationMenuList>
-          </NavigationMenu>
-          <div className="ml-auto flex min-w-0 items-center gap-3">
-            {openError && (
-              <span
-                className="max-w-80 truncate text-sm text-destructive"
-                title={openError}
-              >
-                {COPY[language].landing_open_failed}: {openError}
-              </span>
-            )}
-            {fileName && (
-              <span
-                className="flex max-w-32 items-center gap-1.5 truncate text-sm text-muted-foreground sm:max-w-60"
-                title={appState?.story_path ?? fileName}
-              >
+      <LanguageProvider value={language}>
+        <div className="min-h-screen flex flex-col">
+          <AppEvents onFileLost={onFileLost} language={language} />
+          <header className="flex flex-wrap items-center gap-x-6 gap-y-2 border-b border-border px-4 py-3 sm:flex-nowrap sm:px-6">
+            <a
+              href="#/story"
+              className="flex items-center gap-2 text-lg font-semibold tracking-wide"
+            >
+              <img src="/logo-icon.svg" alt="WEFT" width={20} height={20} />
+              WEFT
+            </a>
+            <NavigationMenu className="order-last min-w-0 max-w-none basis-full justify-start overflow-x-auto sm:order-none sm:basis-auto sm:overflow-visible">
+              <NavigationMenuList className="gap-1">
+                {NAV_ITEMS.map((item) => (
+                  <NavigationMenuItem key={item.path}>
+                    <NavigationMenuLink
+                      href={`#${item.path}`}
+                      active={path === item.path}
+                      aria-current={path === item.path ? "page" : undefined}
+                    >
+                      {COPY[language][item.key]}
+                    </NavigationMenuLink>
+                  </NavigationMenuItem>
+                ))}
+              </NavigationMenuList>
+            </NavigationMenu>
+            <div className="ml-auto flex min-w-0 items-center gap-3">
+              {openError && (
                 <span
-                  className="size-1.5 rounded-full bg-emerald-500"
-                  aria-label={COPY[language].landing_watching}
-                />
-                <span className="truncate">{fileName}</span>
-              </span>
-            )}
-          </div>
-        </header>
-        <PageErrorBoundary key={path}>
-          <Suspense fallback={<PageLoading />}>
-            <Page />
-          </Suspense>
-        </PageErrorBoundary>
-      </div>
+                  className="max-w-80 truncate text-sm text-destructive"
+                  title={openError}
+                >
+                  {COPY[language].landing_open_failed}: {openError}
+                </span>
+              )}
+              {fileName && (
+                <span
+                  className="flex max-w-32 items-center gap-1.5 truncate text-sm text-muted-foreground sm:max-w-60"
+                  title={appState?.story_path ?? fileName}
+                >
+                  <span
+                    className="size-1.5 rounded-full bg-emerald-500"
+                    aria-label={COPY[language].landing_watching}
+                  />
+                  <span className="truncate">{fileName}</span>
+                </span>
+              )}
+            </div>
+          </header>
+          <PageErrorBoundary key={path}>
+            <Suspense fallback={<PageLoading />}>
+              <Page />
+            </Suspense>
+          </PageErrorBoundary>
+        </div>
+      </LanguageProvider>
       {dialogs}
     </>
   );

@@ -1,3 +1,5 @@
+import { createContext, useContext } from "react";
+
 export type Language = "zh-CN" | "zh-TW" | "lzh" | "en" | "ja" | "eo";
 
 export const LANGUAGE_KEY = "weft.language";
@@ -742,6 +744,21 @@ export const COPY = {
 } as const;
 
 export type Copy = (typeof COPY)[Language];
+
+// Storage/browser reads are synchronous I/O: resolve the fallback once at
+// module load instead of on every render (components under <LanguageProvider>
+// always get the live value from App instead).
+const DEFAULT_LANGUAGE = initialLanguage();
+
+const LanguageContext = createContext<Language>(DEFAULT_LANGUAGE);
+
+export { LanguageContext };
+export const LanguageProvider = LanguageContext.Provider;
+
+/** UI copy for the active language; re-renders when the provider language changes. */
+export function useCopy(): Copy {
+  return COPY[useContext(LanguageContext)];
+}
 
 export function initialLanguage(): Language {
   const saved =
