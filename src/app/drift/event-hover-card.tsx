@@ -2,7 +2,7 @@
 
 import type { ReactElement } from "react";
 import { CalendarRangeIcon, UsersIcon } from "lucide-react";
-import { COPY, initialLanguage } from "@/lib/i18n";
+import { useCopy } from "@/lib/i18n";
 
 import {
   HoverCard,
@@ -30,6 +30,7 @@ export function EventHoverCard({
   moais,
   trigger,
 }: EventHoverCardProps) {
+  const copy = useCopy();
   return (
     <HoverCard>
       <HoverCardTrigger delay={250} closeDelay={150} render={trigger} />
@@ -72,7 +73,7 @@ export function EventHoverCard({
                           {offset[1] ? ` — ${offset[1]}` : ""}
                         </>
                       ) : (
-                        COPY[initialLanguage()].event_no_base_time
+                        copy.event_no_base_time
                       )}
                     </span>
                   </div>

@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { PageError, PageLoading } from "@/components/page-state";
-import { COPY, initialLanguage } from "@/lib/i18n";
+import { useCopy } from "@/lib/i18n";
 import {
   getDrifts,
   getMoais,
@@ -18,6 +18,7 @@ export default function DriftPage() {
     moais: MoaiMap;
   } | null>(null);
   const [error, setError] = useState<unknown>(null);
+  const copy = useCopy();
 
   useEffect(() => {
     let cancelled = false;
@@ -42,7 +43,7 @@ export default function DriftPage() {
   }, []);
 
   if (error)
-    return <PageError title={COPY[initialLanguage()].error_load_drift} error={error} />;
+    return <PageError title={copy.error_load_drift} error={error} />;
   if (!data) return <PageLoading />;
 
   const { driftsRaw, moais } = data;
@@ -57,7 +58,7 @@ export default function DriftPage() {
   if (events.length === 0) {
     return (
       <main className="flex flex-1 items-center justify-center text-muted-foreground">
-        <p>{COPY[initialLanguage()].drift_empty}</p>
+        <p>{copy.drift_empty}</p>
       </main>
     );
   }
@@ -66,9 +67,9 @@ export default function DriftPage() {
     <main className="flex-1 px-4 py-8 sm:px-6">
       <div className="mx-auto max-w-7xl">
         <div className="mb-5">
-          <h1 className="text-2xl font-semibold tracking-tight">{COPY[initialLanguage()].drift_title}</h1>
+          <h1 className="text-2xl font-semibold tracking-tight">{copy.drift_title}</h1>
           <p className="mt-1 text-sm text-muted-foreground">
-            {COPY[initialLanguage()].drift_count.replace("{n}", String(events.length)).replace("{s}", String(entries.length))}
+            {copy.drift_count.replace("{n}", String(events.length)).replace("{s}", String(entries.length))}
           </p>
         </div>
 

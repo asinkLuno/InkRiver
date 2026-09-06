@@ -2,7 +2,7 @@
 
 import { useDeferredValue, useState } from "react";
 import type { Drift, Moai, MoaiMap } from "@/lib/api";
-import { COPY, initialLanguage } from "@/lib/i18n";
+import { useCopy } from "@/lib/i18n";
 import {
   Card,
   CardContent,
@@ -34,6 +34,7 @@ export function MoaiGantts({
   moais: MoaiMap;
 }) {
   const [query, setQuery] = useState("");
+  const copy = useCopy();
   const deferredQuery = useDeferredValue(query);
   const normalizedQuery = deferredQuery.trim().toLocaleLowerCase();
   const filteredEntries = normalizedQuery
@@ -56,16 +57,16 @@ export function MoaiGantts({
   return (
     <>
       <div className="mb-5">
-        <h1 className="text-2xl font-semibold tracking-tight">{COPY[initialLanguage()].moai_title}</h1>
+        <h1 className="text-2xl font-semibold tracking-tight">{copy.moai_title}</h1>
         <p className="mt-1 text-sm text-muted-foreground">
-          {COPY[initialLanguage()].moai_count.replace("{n}", String(filteredEntries.length)).replace("{t}", String(entries.length))}
+          {copy.moai_count.replace("{n}", String(filteredEntries.length)).replace("{t}", String(entries.length))}
         </p>
         <input
           type="search"
           value={query}
           onChange={(event) => setQuery(event.target.value)}
-          placeholder={COPY[initialLanguage()].moai_search + "…"}
-          aria-label={COPY[initialLanguage()].moai_search}
+          placeholder={copy.moai_search + "…"}
+          aria-label={copy.moai_search}
           className="mt-4 h-10 w-full max-w-md rounded-md border border-input bg-background px-3 text-sm outline-none placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/40"
         />
       </div>
@@ -98,7 +99,7 @@ export function MoaiGantts({
                       {moai.materials && moai.materials.length > 0 && (
                         <div>
                           <h3 className="mb-2 text-xs font-medium tracking-wide text-muted-foreground uppercase">
-                            {COPY[initialLanguage()].moai_materials}
+                            {copy.moai_materials}
                           </h3>
                           <div className="flex flex-wrap gap-2">
                             {moai.materials.map((material) => (
@@ -134,9 +135,9 @@ export function MoaiGantts({
 
                 <CardContent className="px-4 py-5 sm:px-5">
                   <div className="mb-3 flex items-baseline justify-between gap-3">
-                    <h3 className="font-medium">{COPY[initialLanguage()].moai_timeline}</h3>
+                    <h3 className="font-medium">{copy.moai_timeline}</h3>
                     <span className="text-xs text-muted-foreground">
-                      {(COPY[initialLanguage()] as Record<string, string>)[events.length === 1 ? "moai_event_count" : "moai_event_count_plural"].replace("{n}", String(events.length))}
+                      {copy[events.length === 1 ? "moai_event_count" : "moai_event_count_plural"].replace("{n}", String(events.length))}
                     </span>
                   </div>
                   {events.length > 0 ? (
@@ -148,7 +149,7 @@ export function MoaiGantts({
                     />
                   ) : (
                     <div className="rounded-lg border border-dashed px-6 py-10 text-center text-sm text-muted-foreground">
-                      {COPY[initialLanguage()].moai_events_empty}
+                      {copy.moai_events_empty}
                     </div>
                   )}
                 </CardContent>
@@ -159,7 +160,7 @@ export function MoaiGantts({
         </>
       ) : (
         <div className="rounded-lg border border-dashed px-6 py-12 text-center text-sm text-muted-foreground">
-          {COPY[initialLanguage()].moai_search_empty.replace("{q}", query.trim())}
+          {copy.moai_search_empty.replace("{q}", query.trim())}
         </div>
       )}
     </>
