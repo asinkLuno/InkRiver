@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { PageError, PageLoading } from "@/components/page-state";
-import { COPY, initialLanguage } from "@/lib/i18n";
+import { useCopy } from "@/lib/i18n";
 import {
   getMoaiLinks,
   getMoais,
@@ -18,6 +18,7 @@ export default function MoaiLinkPage() {
     moais: MoaiMap;
   } | null>(null);
   const [error, setError] = useState<unknown>(null);
+  const copy = useCopy();
 
   useEffect(() => {
     let cancelled = false;
@@ -40,14 +41,14 @@ export default function MoaiLinkPage() {
   }, []);
 
   if (error) {
-    return <PageError title={COPY[initialLanguage()].error_load_moai_links} error={error} />;
+    return <PageError title={copy.error_load_moai_links} error={error} />;
   }
   if (!state) return <PageLoading />;
 
   if (state.graph.nodes.length === 0) {
     return (
       <div className="flex flex-1 items-center justify-center text-muted-foreground">
-        <p>{COPY[initialLanguage()].link_empty}</p>
+        <p>{copy.link_empty}</p>
       </div>
     );
   }

@@ -1,11 +1,28 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import * as d3 from "d3";
+// Import the d3 modules actually used instead of the "d3" barrel: the barrel
+// re-exports ~30 subpackages, dragging the whole library into this chunk.
+// "d3-transition" is a side-effect import that patches selection.prototype
+// so svg.transition() below keeps working.
+import { select } from "d3-selection";
+import "d3-transition";
+import { zoom, zoomIdentity } from "d3-zoom";
+import {
+  forceCenter,
+  forceCollide,
+  forceLink,
+  forceManyBody,
+  forceSimulation,
+  type SimulationLinkDatum,
+  type SimulationNodeDatum,
+} from "d3-force";
+import { drag } from "d3-drag";
 import { Focus, LocateFixed, Minus, Plus, Search, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { PageHeader } from "@/components/page-header";
 import type { GraphLink, GraphNode, LinkGraph, MoaiMap } from "@/lib/api";
-import { COPY, initialLanguage } from "@/lib/i18n";
+import { useCopy } from "@/lib/i18n";
 
 interface SubGraph {
   label: string;
@@ -13,12 +30,12 @@ interface SubGraph {
   links: GraphLink[];
 }
 
-interface SimulationNode extends d3.SimulationNodeDatum {
+interface SimulationNode extends SimulationNodeDatum {
   id: string;
   name: string;
 }
 
-interface SimulationLink extends d3.SimulationLinkDatum<SimulationNode> {
+interface SimulationLink extends SimulationLinkDatum<SimulationNode> {
   relations: string;
   bidirectional: boolean;
 }
@@ -90,6 +107,7 @@ function GraphSection({ graph, moais }: { graph: SubGraph; moais: MoaiMap }) {
   const [shouldRender, setShouldRender] = useState(false);
   const [query, setQuery] = useState("");
   const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
+  const copy = useCopy();
 
   const updateDimensions = useCallback(() => {
     const container = containerRef.current;
@@ -146,22 +164,20 @@ function GraphSection({ graph, moais }: { graph: SubGraph; moais: MoaiMap }) {
       bidirectional: link.bidirectional,
     }));
 
-    const svg = d3
-      .select(svgElement)
+    const svg = select(svgElement)
       .attr("viewBox", `0 0 ${width} ${height}`)
       .attr("preserveAspectRatio", "xMidYMid meet");
     svg.selectAll("*").remove();
 
     const canvas = svg.append("g");
-    const zoom = d3
-      .zoom<SVGSVGElement, unknown>()
+    const zoomBehavior = zoom<SVGSVGElement, unknown>()
       .scaleExtent([0.25, 4])
       .filter((event) => {
         if (event.type === "wheel") return event.ctrlKey || event.metaKey;
         return !event.button;
       })
       .on("zoom", (event) => canvas.attr("transform", event.transform));
-    svg.call(zoom);
+    svg.call(zoomBehavior);
     svg.on("dblclick.zoom", null);
 
     const markerId = markerIdRef.current;
@@ -177,7 +193,7 @@ function GraphSection({ graph, moais }: { graph: SubGraph; moais: MoaiMap }) {
       .attr("orient", "auto-start-reverse")
       .append("path")
       .attr("d", "M0,-5L10,0L0,5")
-      .attr("fill", "#525252");
+      .style("fill", "var(--muted-foreground)");
 
     const linkGroups = canvas
       .append("g")
@@ -189,8 +205,8 @@ function GraphSection({ graph, moais }: { graph: SubGraph; moais: MoaiMap }) {
     const paths = linkGroups
       .append("path")
       .attr("fill", "none")
-      .attr("stroke", "#525252")
-      .attr("stroke-opacity", 0.8)
+      .style("stroke", "var(--muted-foreground)")
+      .attr("stroke-opacity", 0.65)
       .attr("stroke-width", 1.5)
       .attr("marker-end", `url(#${markerId})`)
       .attr("marker-start", (link) =>
@@ -202,10 +218,10 @@ function GraphSection({ graph, moais }: { graph: SubGraph; moais: MoaiMap }) {
       .attr("text-anchor", "middle")
       .attr("dy", -5)
       .attr("font-size", 10)
-      .attr("fill", "#404040")
+      .style("fill", "var(--muted-foreground)")
       .attr("paint-order", "stroke")
-      .attr("stroke", "#fafafa")
-      .attr("stroke-width", 4)
+      .style("stroke", "var(--background)")
+      .attr("stroke-width", 3)
       .attr("stroke-linejoin", "round")
       .text((link) => link.relations);
 
@@ -218,23 +234,28 @@ function GraphSection({ graph, moais }: { graph: SubGraph; moais: MoaiMap }) {
       .attr("class", "node")
       .attr("tabindex", 0)
       .attr("role", "button")
-      .attr("aria-label", (node) => COPY[initialLanguage()].graph_view_node.replace("{name}", node.name))
+      .attr("aria-label", (node) => copy.graph_view_node.replace("{name}", node.name))
       .style("cursor", "grab");
 
     nodeGroups
       .append("circle")
       .attr("r", NODE_RADIUS)
       .style("fill", "var(--primary)")
-      .attr("stroke", "#fafafa")
-      .attr("stroke-width", 1.5);
+      .style("stroke", "var(--background)")
+      .attr("stroke-width", 2);
 
+    // Names sit below the stone: CJK names don't fit inside a 20px circle.
     nodeGroups
       .append("text")
       .attr("text-anchor", "middle")
-      .attr("dy", ".32em")
-      .attr("font-family", "Arial, sans-serif")
-      .attr("font-size", 10)
-      .attr("fill", "#fafafa")
+      .attr("dy", NODE_RADIUS + 16)
+      .attr("font-size", 11)
+      .style("font-family", "var(--font-sans)")
+      .style("fill", "var(--foreground)")
+      .attr("paint-order", "stroke")
+      .style("stroke", "var(--background)")
+      .attr("stroke-width", 3)
+      .attr("stroke-linejoin", "round")
       .attr("pointer-events", "none")
       .text((node) => node.name);
 
@@ -258,27 +279,24 @@ function GraphSection({ graph, moais }: { graph: SubGraph; moais: MoaiMap }) {
       });
     svg.on("click.select", () => setSelectedNodeId(null));
 
-    const simulation = d3
-      .forceSimulation(nodes)
+    const simulation = forceSimulation(nodes)
       .force(
         "link",
-        d3
-          .forceLink<SimulationNode, SimulationLink>(links)
+        forceLink<SimulationNode, SimulationLink>(links)
           .id((node) => node.id)
           .distance(100),
       )
-      .force("charge", d3.forceManyBody().strength(-300).distanceMax(500))
-      .force("center", d3.forceCenter(width / 2, height / 2))
-      .force("collide", d3.forceCollide(NODE_RADIUS + 30))
+      .force("charge", forceManyBody().strength(-300).distanceMax(500))
+      .force("center", forceCenter(width / 2, height / 2))
+      .force("collide", forceCollide(NODE_RADIUS + 30))
       .alphaDecay(0.05);
 
-    const drag = d3
-      .drag<SVGGElement, SimulationNode>()
+    const dragBehavior = drag<SVGGElement, SimulationNode>()
       .on("start", (event, node) => {
         if (!event.active) simulation.alphaTarget(0.3).restart();
         node.fx = node.x;
         node.fy = node.y;
-        d3.select(event.sourceEvent.currentTarget).style("cursor", "grabbing");
+        select(event.sourceEvent.currentTarget).style("cursor", "grabbing");
       })
       .on("drag", (event, node) => {
         node.fx = event.x;
@@ -288,9 +306,9 @@ function GraphSection({ graph, moais }: { graph: SubGraph; moais: MoaiMap }) {
         if (!event.active) simulation.alphaTarget(0);
         node.fx = null;
         node.fy = null;
-        d3.select(event.sourceEvent.currentTarget).style("cursor", "grab");
+        select(event.sourceEvent.currentTarget).style("cursor", "grab");
       });
-    nodeGroups.call(drag);
+    nodeGroups.call(dragBehavior);
 
     simulation.on("tick", () => {
       paths.attr("d", linkPath);
@@ -311,7 +329,7 @@ function GraphSection({ graph, moais }: { graph: SubGraph; moais: MoaiMap }) {
       );
     });
 
-    const initialTransform = d3.zoomIdentity
+    const initialTransform = zoomIdentity
       .translate(width * 0.1, height * 0.1)
       .scale(0.8);
     const transition = () => svg.transition().duration(220);
@@ -329,31 +347,31 @@ function GraphSection({ graph, moais }: { graph: SubGraph; moais: MoaiMap }) {
           ),
         ),
       );
-      const transform = d3.zoomIdentity
+      const transform = zoomIdentity
         .translate(width / 2, height / 2)
         .scale(scale)
         .translate(
           -(bounds.x + bounds.width / 2),
           -(bounds.y + bounds.height / 2),
         );
-      transition().call(zoom.transform, transform);
+      transition().call(zoomBehavior.transform, transform);
     };
     actionsRef.current = {
-      zoomIn: () => transition().call(zoom.scaleBy, 1.3),
-      zoomOut: () => transition().call(zoom.scaleBy, 1 / 1.3),
+      zoomIn: () => transition().call(zoomBehavior.scaleBy, 1.3),
+      zoomOut: () => transition().call(zoomBehavior.scaleBy, 1 / 1.3),
       fit,
-      reset: () => transition().call(zoom.transform, initialTransform),
+      reset: () => transition().call(zoomBehavior.transform, initialTransform),
       focusNode: (id) => {
         const node = nodes.find((item) => item.id === id);
         if (node?.x === undefined || node.y === undefined) return;
-        const transform = d3.zoomIdentity
+        const transform = zoomIdentity
           .translate(width / 2, height / 2)
           .scale(1.5)
           .translate(-node.x, -node.y);
-        transition().call(zoom.transform, transform);
+        transition().call(zoomBehavior.transform, transform);
       },
     };
-    svg.call(zoom.transform, initialTransform);
+    svg.call(zoomBehavior.transform, initialTransform);
 
     return () => {
       simulation.stop();
@@ -361,7 +379,9 @@ function GraphSection({ graph, moais }: { graph: SubGraph; moais: MoaiMap }) {
       svg.on(".zoom", null);
       svg.on(".select", null);
     };
-  }, [dimensions, graph, moais, shouldRender]);
+    // `copy` only changes with the UI language (a stable object per language),
+    // so this only rebuilds the graph when the language actually switches.
+  }, [copy, dimensions, graph, moais, shouldRender]);
 
   const selectedMoai = selectedNodeId ? moais[selectedNodeId] : null;
 
@@ -386,9 +406,9 @@ function GraphSection({ graph, moais }: { graph: SubGraph; moais: MoaiMap }) {
     <section className="space-y-3">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <div>
-          <h2 className="text-lg font-semibold">{graph.label}</h2>
-          <p className="text-xs text-muted-foreground">
-            {COPY[initialLanguage()].graph_node_count.replace("{n}", String(graph.nodes.length)).replace("{l}", String(graph.links.length))}
+          <h2 className="font-display text-lg font-medium">{graph.label}</h2>
+          <p className="mt-0.5 font-mono text-xs text-muted-foreground">
+            {copy.graph_node_count.replace("{n}", String(graph.nodes.length)).replace("{l}", String(graph.links.length))}
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
@@ -398,10 +418,10 @@ function GraphSection({ graph, moais }: { graph: SubGraph; moais: MoaiMap }) {
               type="search"
               value={query}
               onChange={(event) => setQuery(event.target.value)}
-              placeholder={COPY[initialLanguage()].graph_search_placeholder}
-              aria-label={COPY[initialLanguage()].graph_search_placeholder}
+              placeholder={copy.graph_search_placeholder}
+              aria-label={copy.graph_search_placeholder}
               list={`nodes-${markerIdRef.current}`}
-              className="h-8 w-40 rounded-lg border border-input bg-background pr-2 pl-8 text-sm outline-none focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/40"
+              className="h-8 w-40 rounded-md border border-input bg-card pr-2 pl-8 text-sm outline-none focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/40"
             />
             <datalist id={`nodes-${markerIdRef.current}`}>
               {graph.nodes.map((node) => (
@@ -411,15 +431,15 @@ function GraphSection({ graph, moais }: { graph: SubGraph; moais: MoaiMap }) {
           </form>
           <div
             className="flex items-center rounded-lg border bg-background p-0.5"
-            aria-label={COPY[initialLanguage()].graph_zoom_in}
+            aria-label={copy.graph_zoom_in}
           >
             <Button
               type="button"
               variant="ghost"
               size="icon-sm"
               onClick={() => actionsRef.current?.zoomOut()}
-              aria-label={COPY[initialLanguage()].graph_zoom_out}
-              title={COPY[initialLanguage()].graph_zoom_out}
+              aria-label={copy.graph_zoom_out}
+              title={copy.graph_zoom_out}
             >
               <Minus />
             </Button>
@@ -428,8 +448,8 @@ function GraphSection({ graph, moais }: { graph: SubGraph; moais: MoaiMap }) {
               variant="ghost"
               size="icon-sm"
               onClick={() => actionsRef.current?.zoomIn()}
-              aria-label={COPY[initialLanguage()].graph_zoom_in}
-              title={COPY[initialLanguage()].graph_zoom_in}
+              aria-label={copy.graph_zoom_in}
+              title={copy.graph_zoom_in}
             >
               <Plus />
             </Button>
@@ -438,8 +458,8 @@ function GraphSection({ graph, moais }: { graph: SubGraph; moais: MoaiMap }) {
               variant="ghost"
               size="icon-sm"
               onClick={() => actionsRef.current?.fit()}
-              aria-label={COPY[initialLanguage()].graph_fit_view}
-              title={COPY[initialLanguage()].graph_fit_view}
+              aria-label={copy.graph_fit_view}
+              title={copy.graph_fit_view}
             >
               <Focus />
             </Button>
@@ -448,8 +468,8 @@ function GraphSection({ graph, moais }: { graph: SubGraph; moais: MoaiMap }) {
               variant="ghost"
               size="icon-sm"
               onClick={() => actionsRef.current?.reset()}
-              aria-label={COPY[initialLanguage()].graph_reset_view}
-              title={COPY[initialLanguage()].graph_reset_view}
+              aria-label={copy.graph_reset_view}
+              title={copy.graph_reset_view}
             >
               <LocateFixed />
             </Button>
@@ -467,7 +487,7 @@ function GraphSection({ graph, moais }: { graph: SubGraph; moais: MoaiMap }) {
           aria-label={`${graph.label} relationship graph`}
         />
         <div className="pointer-events-none absolute bottom-2 left-1/2 -translate-x-1/2 rounded-md bg-background/90 px-2 py-1 text-[11px] whitespace-nowrap text-muted-foreground shadow-sm ring-1 ring-border">
-          {COPY[initialLanguage()].graph_canvas_hint}
+          {copy.graph_canvas_hint}
         </div>
       </div>
       {selectedMoai && (
@@ -478,18 +498,18 @@ function GraphSection({ graph, moais }: { graph: SubGraph; moais: MoaiMap }) {
             size="icon-sm"
             className="absolute top-2 right-2"
             onClick={() => setSelectedNodeId(null)}
-            aria-label={COPY[initialLanguage()].graph_close_detail}
+            aria-label={copy.graph_close_detail}
           >
             <X />
           </Button>
-          <h3 className="pr-8 text-base font-semibold">{selectedMoai.name}</h3>
+          <h3 className="pr-8 font-display text-base font-medium">{selectedMoai.name}</h3>
           {selectedMoai.base_time_display && (
             <p className="mt-1 font-mono text-xs text-muted-foreground">
               {selectedMoai.base_time_display}
             </p>
           )}
           {selectedMoai.description && (
-            <p className="mt-3 max-w-3xl whitespace-pre-wrap text-muted-foreground">
+            <p className="mt-3 max-w-3xl font-display text-[0.95rem] leading-7 whitespace-pre-wrap text-muted-foreground">
               {selectedMoai.description}
             </p>
           )}
@@ -508,25 +528,25 @@ export function MoaiLinkGraph({
 }) {
   const subGraphs = useMemo(() => groupByLabel(data), [data]);
   const [activeLabel, setActiveLabel] = useState(subGraphs[0]?.label ?? "");
+  const copy = useCopy();
   const activeGraph =
     subGraphs.find((graph) => graph.label === activeLabel) ?? subGraphs[0];
 
   if (!activeGraph) return null;
 
   return (
-    <main className="flex flex-1 flex-col px-4 py-6 sm:px-6">
+    <main className="flex flex-1 flex-col px-4 py-8 sm:px-6">
       <div className="mx-auto w-full max-w-7xl">
-        <div className="mb-5">
-          <h1 className="text-2xl font-semibold tracking-tight">{COPY[initialLanguage()].graph_title}</h1>
+        <PageHeader title={copy.graph_title}>
           <p className="mt-1 text-sm text-muted-foreground">
-            {COPY[initialLanguage()].graph_subtitle}
+            {copy.graph_subtitle}
           </p>
-        </div>
+        </PageHeader>
         {subGraphs.length > 1 && (
           <div
             className="mb-5 flex gap-1 overflow-x-auto border-b pb-px"
             role="tablist"
-            aria-label={COPY[initialLanguage()].graph_type_aria}
+            aria-label={copy.graph_type_aria}
           >
             {subGraphs.map((graph) => {
               const active = graph.label === activeGraph.label;
@@ -537,14 +557,14 @@ export function MoaiLinkGraph({
                   role="tab"
                   aria-selected={active}
                   onClick={() => setActiveLabel(graph.label)}
-                  className={`shrink-0 border-b-2 px-3 py-2 text-sm font-medium transition-colors ${
+                  className={`relative shrink-0 px-3 py-2 text-sm font-medium transition-colors after:absolute after:inset-x-3 after:bottom-0 after:h-0.5 after:bg-primary after:content-[''] after:transition-opacity ${
                     active
-                      ? "border-primary text-foreground"
-                      : "border-transparent text-muted-foreground hover:text-foreground"
+                      ? "text-foreground after:opacity-100"
+                      : "text-muted-foreground after:opacity-0 hover:text-foreground"
                   }`}
                 >
                   {graph.label}
-                  <span className="ml-1.5 text-xs opacity-60">
+                  <span className="ml-1.5 font-mono text-xs opacity-60">
                     {graph.links.length}
                   </span>
                 </button>

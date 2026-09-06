@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { PageError, PageLoading } from "@/components/page-state";
-import { COPY, initialLanguage } from "@/lib/i18n";
+import { useCopy } from "@/lib/i18n";
 import {
   getMoais,
   getNarratives,
@@ -11,6 +11,7 @@ import {
   type NarrativeMap,
 } from "@/lib/api";
 import { compareDriftTime, DriftGantt, GanttLegend } from "../drift/gantt";
+import { PageHeader } from "@/components/page-header";
 
 export default function NarrativePage() {
   const [data, setData] = useState<{
@@ -18,6 +19,7 @@ export default function NarrativePage() {
     moais: MoaiMap;
   } | null>(null);
   const [error, setError] = useState<unknown>(null);
+  const copy = useCopy();
 
   useEffect(() => {
     let cancelled = false;
@@ -42,7 +44,7 @@ export default function NarrativePage() {
   }, []);
 
   if (error) {
-    return <PageError title={COPY[initialLanguage()].error_load_narrative} error={error} />;
+    return <PageError title={copy.error_load_narrative} error={error} />;
   }
   if (!data) return <PageLoading />;
 
@@ -62,7 +64,7 @@ export default function NarrativePage() {
   if (entries.length === 0) {
     return (
       <main className="flex flex-1 items-center justify-center text-muted-foreground">
-        <p>{COPY[initialLanguage()].narrative_empty}</p>
+        <p>{copy.narrative_empty}</p>
       </main>
     );
   }
@@ -70,12 +72,10 @@ export default function NarrativePage() {
   return (
     <main className="flex-1 px-4 py-8 sm:px-6">
       <div className="mx-auto max-w-7xl">
-        <div className="mb-5">
-          <h1 className="text-2xl font-semibold tracking-tight">{COPY[initialLanguage()].narrative_title}</h1>
-          <p className="mt-1 text-sm text-muted-foreground">
-            {COPY[initialLanguage()].narrative_count.replace("{n}", String(eventCount)).replace("{s}", String(entries.length))}
-          </p>
-        </div>
+        <PageHeader
+          title={copy.narrative_title}
+          meta={copy.narrative_count.replace("{n}", String(eventCount)).replace("{s}", String(entries.length))}
+        />
 
         <div className="space-y-8">
           {entries.map(({ name, narrative, events }) => (
@@ -84,7 +84,7 @@ export default function NarrativePage() {
               driftKey={name}
               events={events}
               moais={moais}
-              description={COPY[initialLanguage()].narrative_observer.replace("{o}", narrative.observer).replace("{t}", narrative.subject.join(" · "))}
+              description={copy.narrative_observer.replace("{o}", narrative.observer).replace("{t}", narrative.subject.join(" · "))}
             />
           ))}
         </div>

@@ -26,13 +26,13 @@ export function SettingsDialog({
   return (
     <Modal open={open} onClose={onClose} label={copy.settings_title} closeLabel={copy.event_dismiss}>
       <div className="border-b border-border px-6 py-4">
-        <h2 className="text-lg font-semibold tracking-tight">{copy.settings_title}</h2>
+        <h2 className="font-display text-lg font-medium tracking-tight">{copy.settings_title}</h2>
       </div>
       <div className="space-y-6 px-6 py-5">
         <section className="space-y-2">
           <label className="block text-sm font-medium">{copy.settings_language}</label>
           <select
-            className="h-9 w-full rounded-md border bg-background px-3 text-sm"
+            className="h-9 w-full rounded-md border bg-card px-3 text-sm"
             value={language}
             onChange={(event) =>
               onLanguageChange(event.target.value as Language)
